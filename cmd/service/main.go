@@ -2,17 +2,18 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net"
+	"os"
+	"strconv"
+	"time"
+
 	"github.com/joho/godotenv"
 	"github.com/mistandok/auth/internal/user"
 	"github.com/mistandok/auth/pkg/user_v1"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"log"
-	"net"
-	"os"
-	"strconv"
-	"time"
 )
 
 const envName = ".env.example"

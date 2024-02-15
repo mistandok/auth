@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"fmt"
+
 	"github.com/brianvoe/gofakeit"
 	"github.com/mistandok/auth/pkg/user_v1"
 	"github.com/rs/zerolog"
@@ -21,13 +22,13 @@ func NewServer(logger *zerolog.Logger) *Server {
 	}
 }
 
-func (s *Server) Create(ctx context.Context, request *user_v1.CreateRequest) (*user_v1.CreateResponse, error) {
+func (s *Server) Create(_ context.Context, request *user_v1.CreateRequest) (*user_v1.CreateResponse, error) {
 	s.logger.Debug().Msg(fmt.Sprintf("try create user: %+v", request))
 
 	return &user_v1.CreateResponse{Id: 1}, nil
 }
 
-func (s *Server) Get(ctx context.Context, request *user_v1.GetRequest) (*user_v1.GetResponse, error) {
+func (s *Server) Get(_ context.Context, request *user_v1.GetRequest) (*user_v1.GetResponse, error) {
 	s.logger.Debug().Msg(fmt.Sprintf("try get user: %+v", request))
 
 	return &user_v1.GetResponse{
@@ -40,13 +41,13 @@ func (s *Server) Get(ctx context.Context, request *user_v1.GetRequest) (*user_v1
 	}, nil
 }
 
-func (s *Server) Update(ctx context.Context, request *user_v1.UpdateRequest) (*emptypb.Empty, error) {
+func (s *Server) Update(_ context.Context, request *user_v1.UpdateRequest) (*emptypb.Empty, error) {
 	s.logger.Debug().Msg(fmt.Sprintf("try update user: %+v", request))
 
 	return &emptypb.Empty{}, nil
 }
 
-func (s *Server) Delete(ctx context.Context, request *user_v1.DeleteRequest) (*emptypb.Empty, error) {
+func (s *Server) Delete(_ context.Context, request *user_v1.DeleteRequest) (*emptypb.Empty, error) {
 	s.logger.Debug().Msg(fmt.Sprintf("try delete user: %+v", request))
 
 	return &emptypb.Empty{}, nil
