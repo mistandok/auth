@@ -3,27 +3,34 @@ package main
 import (
 	"fmt"
 	"github.com/joho/godotenv"
-	"github.com/mistandok/auth/internal/servers/user"
+	"github.com/mistandok/auth/internal/user"
 	"github.com/mistandok/auth/pkg/user_v1"
+	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
+	"os"
 	"strconv"
+	"time"
 )
 
-const envName = ".env"
+const envName = ".env.example"
 
 func main() {
 	envs := mustGetEnvs(envName)
 	grpcPort := mustFetchGRPCPort(envs)
+	logLevel := mustFetchLogLevel(envs)
 	listener := mustGetListener(grpcPort)
+
+	logger := setupZeroLog(logLevel, time.RFC3339)
+	userServer := user.NewServer(logger)
 
 	server := grpc.NewServer()
 	reflection.Register(server)
-	user_v1.RegisterUserV1Server(server, &user.Server{})
+	user_v1.RegisterUserV1Server(server, userServer)
 
-	log.Printf("сервер слушает на %v", listener.Addr())
+	log.Printf("сервер запущен на %v", listener.Addr())
 
 	if err := server.Serve(listener); err != nil {
 		log.Fatalf("ошибка сервера: %v", err)
@@ -61,4 +68,26 @@ func mustGetListener(port int) net.Listener {
 	}
 
 	return lis
+}
+
+func mustFetchLogLevel(envs map[string]string) zerolog.Level {
+	name := "LOG_LEVEL"
+	logLevelStr, ok := envs[name]
+	if !ok {
+		log.Fatalf("не задана переменная окружения: %s", name)
+	}
+	logLevelInt, err := strconv.Atoi(logLevelStr)
+	if err != nil {
+		log.Fatalf("некорректное значение для переменной окружения %s, err: %v", name, err)
+	}
+	return zerolog.Level(logLevelInt)
+}
+
+func setupZeroLog(logLevel zerolog.Level, timeFormat string) *zerolog.Logger {
+	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: timeFormat}
+	logger := zerolog.New(output).With().Timestamp().Logger()
+	zerolog.SetGlobalLevel(logLevel)
+	zerolog.TimeFieldFormat = timeFormat
+
+	return &logger
 }
