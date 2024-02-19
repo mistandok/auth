@@ -1,0 +1,14 @@
+version: '3'
+
+volumes:
+  postgres_volume:
+
+services:
+  storage:
+    image: postgres:16.1
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    env_file:
+      - .env.local
+    ports:
+      - "${PG_PORT}:5432"
