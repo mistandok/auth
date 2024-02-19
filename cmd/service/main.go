@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/mistandok/auth/internal/user/server_v1"
 	"log"
 	"net"
 	"os"
@@ -9,14 +10,13 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-	"github.com/mistandok/auth/internal/user"
 	"github.com/mistandok/auth/pkg/user_v1"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
-const envName = ".env.example"
+const envName = ".env.local"
 
 func main() {
 	envs := mustGetEnvs(envName)
@@ -25,7 +25,7 @@ func main() {
 	listener := mustGetListener(grpcPort)
 
 	logger := setupZeroLog(logLevel, time.RFC3339)
-	userServer := user.NewServer(logger)
+	userServer := server_v1.NewServer(logger)
 
 	server := grpc.NewServer()
 	reflection.Register(server)
