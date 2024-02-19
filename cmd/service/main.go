@@ -1,30 +1,42 @@
 package main
 
 import (
-	"fmt"
+	"github.com/mistandok/auth/internal/config"
+	"github.com/mistandok/auth/internal/config/env"
 	"github.com/mistandok/auth/internal/user/server_v1"
-	"log"
-	"net"
-	"os"
-	"strconv"
-	"time"
-
-	"github.com/joho/godotenv"
 	"github.com/mistandok/auth/pkg/user_v1"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"log"
+	"net"
+	"os"
 )
 
 const envName = ".env.local"
 
 func main() {
-	envs := mustGetEnvs(envName)
-	grpcPort := mustFetchGRPCPort(envs)
-	logLevel := mustFetchLogLevel(envs)
-	listener := mustGetListener(grpcPort)
+	err := config.Load(envName)
+	if err != nil {
+		log.Fatalf("ошибка при получении переменных окружения: %v", err)
+	}
 
-	logger := setupZeroLog(logLevel, time.RFC3339)
+	grpcConfig, err := env.NewGRPCConfigSearcher().Get()
+	if err != nil {
+		log.Fatalf("ошибка при получении конфига grpc: %v", err)
+	}
+
+	logConfig, err := env.NewLogConfigSearcher().Get()
+	if err != nil {
+		log.Fatalf("ошибка при получении уровня логирования: %v", err)
+	}
+
+	listener, err := net.Listen("tcp", grpcConfig.Address())
+	if err != nil {
+		log.Fatalf("ошибка при прослушивании: %v", err)
+	}
+
+	logger := setupZeroLog(logConfig)
 	userServer := server_v1.NewServer(logger)
 
 	server := grpc.NewServer()
@@ -38,57 +50,11 @@ func main() {
 	}
 }
 
-func mustGetEnvs(env string) map[string]string {
-	envs, err := godotenv.Read(env)
-	if err != nil {
-		log.Fatalf("не удалось прочитать переменные окружения: %v", err)
-	}
-
-	return envs
-}
-
-func mustFetchGRPCPort(envs map[string]string) int {
-	name := "GRPC_PORT"
-	portStr, ok := envs[name]
-	if !ok {
-		log.Fatalf("не задана переменная окружения: %s", name)
-	}
-
-	port, err := strconv.Atoi(portStr)
-	if err != nil {
-		log.Fatalf("некорректное значение для переменной окружения %s, err: %v", name, err)
-	}
-
-	return port
-}
-
-func mustGetListener(port int) net.Listener {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
-	if err != nil {
-		log.Fatalf("ошибка при прослушивании: %v", err)
-	}
-
-	return lis
-}
-
-func mustFetchLogLevel(envs map[string]string) zerolog.Level {
-	name := "LOG_LEVEL"
-	logLevelStr, ok := envs[name]
-	if !ok {
-		log.Fatalf("не задана переменная окружения: %s", name)
-	}
-	logLevelInt, err := strconv.Atoi(logLevelStr)
-	if err != nil {
-		log.Fatalf("некорректное значение для переменной окружения %s, err: %v", name, err)
-	}
-	return zerolog.Level(logLevelInt)
-}
-
-func setupZeroLog(logLevel zerolog.Level, timeFormat string) *zerolog.Logger {
-	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: timeFormat}
+func setupZeroLog(logConfig *config.LogConfig) *zerolog.Logger {
+	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: logConfig.TimeFormat}
 	logger := zerolog.New(output).With().Timestamp().Logger()
-	zerolog.SetGlobalLevel(logLevel)
-	zerolog.TimeFieldFormat = timeFormat
+	zerolog.SetGlobalLevel(logConfig.LogLevel)
+	zerolog.TimeFieldFormat = logConfig.TimeFormat
 
 	return &logger
 }
