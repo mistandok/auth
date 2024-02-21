@@ -11,4 +11,5 @@ services:
     env_file:
       - .env.local
     ports:
-      - "${PG_PORT}:5432"
+      - "${PG_PORT}:${PG_PORT}"
+    command: -p ${PG_PORT}
