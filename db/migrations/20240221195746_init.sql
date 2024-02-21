@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS "user" (
     password VARCHAR(100) NOT NULL,
     role VARCHAR(100) NOT NULL,
     created_at timestamp with time zone default current_timestamp NOT NULL
+    updated_at timestamp with time zone default current_timestamp NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_role_email_name ON "user" (role, email, name);

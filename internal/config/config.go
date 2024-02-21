@@ -29,10 +29,22 @@ type LogConfig struct {
 	TimeFormat string
 }
 
+type PgConfig struct {
+	Host     string
+	Port     int
+	User     string
+	Password string
+	DbName   string
+}
+
 type GRPCConfigSearcher interface {
 	Get() (*GRPCConfig, error)
 }
 
 type LogConfigSearcher interface {
 	Get() (*LogConfig, error)
+}
+
+type PgConfigSearcher interface {
+	Get() (*PgConfig, error)
 }

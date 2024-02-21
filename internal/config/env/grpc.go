@@ -12,13 +12,13 @@ const (
 	grpcPortEnvName = "GRPC_PORT"
 )
 
-type GRPCConfigSearcher struct{}
+type GRPCCfgSearcher struct{}
 
-func NewGRPCConfigSearcher() *GRPCConfigSearcher {
-	return &GRPCConfigSearcher{}
+func NewGRPCCfgSearcher() *GRPCCfgSearcher {
+	return &GRPCCfgSearcher{}
 }
 
-func (s *GRPCConfigSearcher) Get() (*config.GRPCConfig, error) {
+func (s *GRPCCfgSearcher) Get() (*config.GRPCConfig, error) {
 	host := os.Getenv(grpcHostEnvName)
 	if len(host) == 0 {
 		return nil, errors.New("grpc host not found")

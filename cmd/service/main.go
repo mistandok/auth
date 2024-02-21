@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
+	"flag"
 	"github.com/mistandok/auth/internal/config"
 	"github.com/mistandok/auth/internal/config/env"
+	"github.com/mistandok/auth/internal/repositories/postgresql"
 	"github.com/mistandok/auth/internal/user/server_v1"
 	"github.com/mistandok/auth/pkg/user_v1"
 	"github.com/rs/zerolog"
@@ -13,25 +16,41 @@ import (
 	"os"
 )
 
-const envName = ".env.local"
+var configPath string
+
+func init() {
+	flag.StringVar(&configPath, "config", ".env", "path to config file")
+	flag.Parse()
+}
 
 func main() {
-	err := config.Load(envName)
+	ctx := context.Background()
+
+	err := config.Load(configPath)
 	if err != nil {
 		log.Fatalf("ошибка при получении переменных окружения: %v", err)
 	}
 
-	grpcConfig, err := env.NewGRPCConfigSearcher().Get()
+	grpcConfig, err := env.NewGRPCCfgSearcher().Get()
 	if err != nil {
 		log.Fatalf("ошибка при получении конфига grpc: %v", err)
 	}
 
-	logConfig, err := env.NewLogConfigSearcher().Get()
+	logConfig, err := env.NewLogCfgSearcher().Get()
 	if err != nil {
 		log.Fatalf("ошибка при получении уровня логирования: %v", err)
 	}
 
-	listener, err := net.Listen("tcp", grpcConfig.Address())
+	pgConfig, err := env.NewPgCfgSearcher().Get()
+	if err != nil {
+		log.Fatalf("ошибка при получении конфига DB: %v", err)
+	}
+
+	_, connCloser := postgresql.MustInitPgConnection(ctx, *pgConfig)
+	defer connCloser()
+
+	listenConfig := net.ListenConfig{}
+	listener, err := listenConfig.Listen(ctx, "tcp", grpcConfig.Address())
 	if err != nil {
 		log.Fatalf("ошибка при прослушивании: %v", err)
 	}

@@ -14,13 +14,13 @@ const (
 	logTimeFormat = "LOG_TIME_FORMAT"
 )
 
-type LogConfigSearcher struct{}
+type LogCfgSearcher struct{}
 
-func NewLogConfigSearcher() *LogConfigSearcher {
-	return &LogConfigSearcher{}
+func NewLogCfgSearcher() *LogCfgSearcher {
+	return &LogCfgSearcher{}
 }
 
-func (s *LogConfigSearcher) Get() (*config.LogConfig, error) {
+func (s *LogCfgSearcher) Get() (*config.LogConfig, error) {
 	level := os.Getenv(logLevel)
 	if len(level) == 0 {
 		return nil, errors.New("не найден уровень логирования")
