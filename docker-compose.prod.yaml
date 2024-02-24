@@ -16,6 +16,7 @@ services:
 
   migrator:
     build:
+      context: .
       dockerfile: deploy/dockerfiles/migrator.Dockerfile
     env_file:
       - deploy/env/.env.prod
@@ -26,6 +27,7 @@ services:
 
   auth_service:
     build:
+      context: .
       dockerfile: deploy/dockerfiles/auth.Dockerfile
     env_file:
       - deploy/env/.env.prod
