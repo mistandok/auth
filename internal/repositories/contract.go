@@ -1,45 +1,48 @@
 package repositories
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 type CRUDUserCreateIn struct {
-	Name     string
-	Email    string
-	Password string
-	Role     string
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Role     string `json:"role"`
 }
 
 type CRUDUserCreateOut struct {
-	Id int64
+	Id int64 `json:"id"`
 }
 
 type CRUDUserUpdateIn struct {
-	Id    int64
-	Name  string
-	Email string
-	Role  string
+	Id    int64   `json:"id"`
+	Name  *string `json:"name"`
+	Email *string `json:"email"`
+	Role  *string `json:"role"`
 }
 
 type CRUDUserGetIn struct {
-	Id int64
+	Id int64 `json:"id"`
 }
 
 type CRUDUserGetOut struct {
-	Id        int64
-	Name      string
-	Email     string
-	Role      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	Id        int64     `json:"id"`
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	Role      string    `json:"role"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type CRUDUserDeleteIn struct {
-	Id int64
+	Id int64 `json:"id"`
 }
 
-type CRUDUserExecutor interface {
-	Create(*CRUDUserCreateIn) (*CRUDUserCreateOut, error)
-	Update(*CRUDUserUpdateIn) error
-	Get(*CRUDUserGetIn) (*CRUDUserGetOut, error)
-	Delete(*CRUDUserDeleteIn) error
+type CRUDUserRepository interface {
+	Create(context.Context, *CRUDUserCreateIn) (*CRUDUserCreateOut, error)
+	Update(context.Context, *CRUDUserUpdateIn) error
+	Get(context.Context, *CRUDUserGetIn) (*CRUDUserGetOut, error)
+	Delete(context.Context, *CRUDUserDeleteIn) error
 }

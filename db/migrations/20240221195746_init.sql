@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS "user" (
     email VARCHAR(100) UNIQUE NOT NUll,
     password VARCHAR(100) NOT NULL,
     role VARCHAR(100) NOT NULL,
-    created_at timestamp with time zone default current_timestamp NOT NULL
+    created_at timestamp with time zone default current_timestamp NOT NULL,
     updated_at timestamp with time zone default current_timestamp NOT NULL
 );
 
