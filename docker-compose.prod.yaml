@@ -12,6 +12,28 @@ services:
       - postgres_volume:/var/lib/postgresql/data
     env_file:
       - deploy/env/.env.prod
-    ports:
-      - "${PG_PORT}:${PG_PORT}"
+    expose:
+      - ${PG_PORT}
     command: -p ${PG_PORT}
+
+  migrator:
+    build:
+      dockerfile: deploy/dockerfiles/migrator.Dockerfile
+    env_file:
+      - deploy/env/.env.prod
+    depends_on:
+      - storage
+    environment:
+      PG_HOST: storage
+
+  auth_service:
+    build:
+      dockerfile: deploy/dockerfiles/auth.Dockerfile
+    env_file:
+      - deploy/env/.env.prod
+    depends_on:
+      - storage
+    environment:
+      PG_HOST: storage
+    ports:
+      - "${GRPC_PORT}:${GRPC_PORT}"

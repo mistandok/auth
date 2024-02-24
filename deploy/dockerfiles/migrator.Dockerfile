@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:20.04
 
 ENV APP_DIR /opt/app
 
@@ -14,10 +14,11 @@ RUN apt-get update \
 ADD https://github.com/pressly/goose/releases/download/v3.14.0/goose_linux_x86_64 /bin/goose
 
 COPY /db/migrations/*.sql db/migrations/
-COPY deploy/scripts/local-migrator-start.sh .
-COPY deploy/env/.env.local .env.local
+COPY deploy/scripts/migrator-start.sh .
 
 RUN setfacl -R -m u:web:rwx /bin/goose
-RUN setfacl -R -m u:web:rwx $APP_DIR/local-migrator-start.sh
+RUN setfacl -R -m u:web:rwx $APP_DIR/migrator-start.sh
 
-ENTRYPOINT ["bash", "local-migrator-start.sh"]
+USER web
+
+ENTRYPOINT ["bash", "migrator-start.sh"]

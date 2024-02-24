@@ -18,7 +18,7 @@ services:
 
   migrator:
     build:
-      dockerfile: deploy/dockerfiles/local-migrator.Dockerfile
+      dockerfile: deploy/dockerfiles/migrator.Dockerfile
     env_file:
       - deploy/env/.env.local
     depends_on:
