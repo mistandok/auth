@@ -1,9 +1,20 @@
-include ./deploy/env/.env.local
+define setup_env
+	$(eval ENV_FILE := ./deploy/env/.env.$(1))
+	@echo "- setup env $(ENV_FILE)"
+	$(eval include ./deploy/env/.env.$(1))
+	$(eval export)
+endef
+
+setup-local-env:
+	$(call setup_env,local)
+
+setup-prod-env:
+	$(call setup_env,prod)
 
 LOCAL_BIN:=$(CURDIR)/bin
 
-LOCAL_MIGRATION_DIR=$(MIGRATION_DIR)
-LOCAL_MIGRATION_DSN="host=$(PG_HOST) port=$(PG_PORT) dbname=$(POSTGRES_DB) user=$(POSTGRES_USER) password=$(POSTGRES_PASSWORD) sslmode=disable"
+MIGRATION_DIR=$(MIGRATION_DIR)
+MIGRATION_DSN="host=$(PG_HOST) port=$(PG_PORT) dbname=$(POSTGRES_DB) user=$(POSTGRES_USER) password=$(POSTGRES_PASSWORD) sslmode=disable"
 
 install-deps:
 	GOBIN=$(LOCAL_BIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1
@@ -34,20 +45,38 @@ generate-user-api:
 	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
 	api/user_v1/user.proto
 
-local-migration-status:
-	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} status -v
+migration-status:
+	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goose -dir ${MIGRATION_DIR} postgres ${MIGRATION_DSN} status -v
 
-local-migration-up:
-	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} up -v
+migration-up:
+	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goose -dir ${MIGRATION_DIR} postgres ${MIGRATION_DSN} up -v
 
-local-migration-down:
-	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} down -v
+migration-down:
+	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goose -dir ${MIGRATION_DIR} postgres ${MIGRATION_DSN} down -v
+
+local-migration-status: setup-local-env migration-status
+
+local-migration-up: setup-local-env migration-up
+
+local-migration-down: setup-local-env migration-down
+
+prod-migration-status: setup-prod-env migration-status
+
+prod-migration-up: setup-prod-env migration-up
+
+prod-migration-down: setup-prod-env migration-down
 
 local-down-app:
 	docker-compose --env-file deploy/env/.env.local -f deploy/docker-compose.local.yaml down -v
 
 local-start-app:
 	docker-compose --env-file deploy/env/.env.local -f deploy/docker-compose.local.yaml up -d --build
+
+prod-down-app:
+	docker-compose --env-file deploy/env/.env.prod -f deploy/docker-compose.prod.yaml down -v
+
+prod-start-app:
+	docker-compose --env-file deploy/env/.env.prod -f deploy/docker-compose.prod.yaml up -d --build
 
 create-new-migration:
 	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} create $(migration_name) sql
