@@ -1,4 +1,4 @@
-include .env.local
+include ./deploy/env/.env.local
 
 LOCAL_BIN:=$(CURDIR)/bin
 
@@ -44,10 +44,10 @@ local-migration-down:
 	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} down -v
 
 local-down-app:
-	docker-compose --env-file .env.local -f docker-compose.local.yaml down -v
+	docker-compose --env-file deploy/env/.env.local -f deploy/docker-compose.local.yaml down -v
 
 local-start-app:
-	docker-compose --env-file .env.local -f docker-compose.local.yaml up -d --build
+	docker-compose --env-file deploy/env/.env.local -f deploy/docker-compose.local.yaml up -d --build
 
 create-new-migration:
 	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} create $(migration_name) sql
