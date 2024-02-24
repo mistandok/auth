@@ -67,16 +67,16 @@ prod-migration-up: setup-prod-env migration-up
 prod-migration-down: setup-prod-env migration-down
 
 local-down-app:
-	docker-compose --env-file deploy/env/.env.local -f deploy/docker-compose.local.yaml down -v
+	docker-compose --env-file deploy/env/.env.local -f docker-compose.local.yaml down -v
 
 local-start-app:
-	docker-compose --env-file deploy/env/.env.local -f deploy/docker-compose.local.yaml up -d --build
+	docker-compose --env-file deploy/env/.env.local -f docker-compose.local.yaml up -d --build
 
 prod-down-app:
-	docker-compose --env-file deploy/env/.env.prod -f deploy/docker-compose.prod.yaml down -v
+	docker-compose --env-file deploy/env/.env.prod -f docker-compose.prod.yaml down -v
 
 prod-start-app:
-	docker-compose --env-file deploy/env/.env.prod -f deploy/docker-compose.prod.yaml up -d --build
+	docker-compose --env-file deploy/env/.env.prod -f docker-compose.prod.yaml up -d --build
 
 create-new-migration:
 	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} create $(migration_name) sql
