@@ -2,6 +2,8 @@ package postgresql
 
 import (
 	"context"
+	"time"
+
 	"github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -9,22 +11,24 @@ import (
 	"github.com/mistandok/auth/internal/repositories"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
-	"time"
 )
 
-type CRUDUser struct {
+// CRUDUserRepo user repo for crud operation.
+type CRUDUserRepo struct {
 	pool   *pgxpool.Pool
 	logger *zerolog.Logger
 }
 
-func NewCRUDUser(pool *pgxpool.Pool, logger *zerolog.Logger) *CRUDUser {
-	return &CRUDUser{
+// NewCRUDUserRepo  get new repo instance.
+func NewCRUDUserRepo(pool *pgxpool.Pool, logger *zerolog.Logger) *CRUDUserRepo {
+	return &CRUDUserRepo{
 		pool:   pool,
 		logger: logger,
 	}
 }
 
-func (u *CRUDUser) Create(ctx context.Context, in *repositories.CRUDUserCreateIn) (*repositories.CRUDUserCreateOut, error) {
+// Create user in db.
+func (u *CRUDUserRepo) Create(ctx context.Context, in *repositories.CRUDUserCreateIn) (*repositories.CRUDUserCreateOut, error) {
 	query := `
 	INSERT INTO "user" (name, email, password, role, created_at, updated_at)
 	VALUES (@name, @email, @password, @role, @createdAt, @updatedAt)
@@ -60,7 +64,8 @@ func (u *CRUDUser) Create(ctx context.Context, in *repositories.CRUDUserCreateIn
 	return &out, nil
 }
 
-func (u *CRUDUser) Update(ctx context.Context, in *repositories.CRUDUserUpdateIn) error {
+// Update user in db.
+func (u *CRUDUserRepo) Update(ctx context.Context, in *repositories.CRUDUserUpdateIn) error {
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 	params := make([]any, 0)
 
@@ -85,22 +90,26 @@ func (u *CRUDUser) Update(ctx context.Context, in *repositories.CRUDUserUpdateIn
 	params = append(params, time.Now())
 
 	query = query.Where(squirrel.Eq{"id": "?"})
-	params = append(params, in.Id)
+	params = append(params, in.ID)
+
+	query = query.Suffix("RETURNING \"id\"")
 
 	sql, _, err := query.ToSql()
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	_, err = u.pool.Exec(ctx, sql, params...)
-	if err != nil {
-		return errors.WithStack(err)
+	row := u.pool.QueryRow(ctx, sql, params...)
+	var userID int64
+	if err = row.Scan(&userID); errors.Is(err, pgx.ErrNoRows) {
+		return repositories.ErrUserNotFound
 	}
 
-	return nil
+	return err
 }
 
-func (u *CRUDUser) Get(ctx context.Context, in *repositories.CRUDUserGetIn) (*repositories.CRUDUserGetOut, error) {
+// Get user from db.
+func (u *CRUDUserRepo) Get(ctx context.Context, in *repositories.CRUDUserGetIn) (*repositories.CRUDUserGetOut, error) {
 	query := `
 	SELECT 
 	    id, name, email, role, created_at createdAt, updated_at updatedAt
@@ -111,7 +120,7 @@ func (u *CRUDUser) Get(ctx context.Context, in *repositories.CRUDUserGetIn) (*re
     `
 
 	args := pgx.NamedArgs{
-		"id": in.Id,
+		"id": in.ID,
 	}
 
 	rows, err := u.pool.Query(ctx, query, args)
@@ -131,14 +140,15 @@ func (u *CRUDUser) Get(ctx context.Context, in *repositories.CRUDUserGetIn) (*re
 	return &out, nil
 }
 
-func (u *CRUDUser) Delete(ctx context.Context, in *repositories.CRUDUserDeleteIn) error {
+// Delete user from db.
+func (u *CRUDUserRepo) Delete(ctx context.Context, in *repositories.CRUDUserDeleteIn) error {
 	query := `
     	DELETE FROM "user"
 		WHERE id = @id
     `
 
 	args := pgx.NamedArgs{
-		"id": in.Id,
+		"id": in.ID,
 	}
 
 	_, err := u.pool.Exec(ctx, query, args)

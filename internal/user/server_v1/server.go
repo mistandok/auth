@@ -3,6 +3,7 @@ package server_v1
 import (
 	"context"
 	"fmt"
+
 	"github.com/mistandok/auth/internal/common"
 	"github.com/mistandok/auth/internal/repositories"
 	"github.com/pkg/errors"
@@ -15,6 +16,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+// CRUDUserRepo interface for crud user repo in server.
 type CRUDUserRepo interface {
 	Create(context.Context, *repositories.CRUDUserCreateIn) (*repositories.CRUDUserCreateOut, error)
 	Update(context.Context, *repositories.CRUDUserUpdateIn) error
@@ -52,21 +54,21 @@ func (s *Server) Create(ctx context.Context, request *user_v1.CreateRequest) (*u
 		switch {
 		case errors.Is(err, repositories.ErrEmailIsTaken):
 			s.logger.Warn().Err(err).Msg("не удалось создать пользователя")
-			return &user_v1.CreateResponse{}, status.Error(codes.InvalidArgument, err.Error())
+			return &user_v1.CreateResponse{}, status.Error(codes.AlreadyExists, err.Error())
 		default:
 			s.logger.Err(err).Msg("не удалось создать пользователя")
 			return &user_v1.CreateResponse{}, status.Error(codes.Internal, "прошу понять и простить :(")
 		}
 	}
 
-	return &user_v1.CreateResponse{Id: out.Id}, nil
+	return &user_v1.CreateResponse{Id: out.ID}, nil
 }
 
 // Get user by params
 func (s *Server) Get(ctx context.Context, request *user_v1.GetRequest) (*user_v1.GetResponse, error) {
 	s.logger.Debug().Msg(fmt.Sprintf("try get user: %+v", request))
 
-	out, err := s.userRepo.Get(ctx, &repositories.CRUDUserGetIn{Id: request.Id})
+	out, err := s.userRepo.Get(ctx, &repositories.CRUDUserGetIn{ID: request.Id})
 	if err != nil {
 		switch {
 		case errors.Is(err, repositories.ErrUserNotFound):
@@ -79,7 +81,7 @@ func (s *Server) Get(ctx context.Context, request *user_v1.GetRequest) (*user_v1
 	}
 
 	return &user_v1.GetResponse{
-		Id:        out.Id,
+		Id:        out.ID,
 		Name:      out.Name,
 		Email:     out.Email,
 		Role:      common.RoleFromRoleName(out.Role),
@@ -93,14 +95,20 @@ func (s *Server) Update(ctx context.Context, request *user_v1.UpdateRequest) (*e
 	s.logger.Debug().Msg(fmt.Sprintf("try update user: %+v", request))
 
 	err := s.userRepo.Update(ctx, &repositories.CRUDUserUpdateIn{
-		Id:    request.Id,
+		ID:    request.Id,
 		Name:  request.Name,
 		Email: request.Email,
 		Role:  common.PointerRoleNameFromRole(request.Role),
 	})
 	if err != nil {
-		s.logger.Err(err).Msg("не удалось обновить пользователя")
-		return &emptypb.Empty{}, status.Error(codes.Internal, "прошу понять и простить :(")
+		switch {
+		case errors.Is(err, repositories.ErrUserNotFound):
+			s.logger.Warn().Msg("не удалось обновить пользователя")
+			return &emptypb.Empty{}, status.Error(codes.NotFound, err.Error())
+		default:
+			s.logger.Err(err).Msg("не удалось обновить пользователя")
+			return &emptypb.Empty{}, status.Error(codes.Internal, "прошу понять и простить :(")
+		}
 	}
 
 	return &emptypb.Empty{}, nil
@@ -110,7 +118,7 @@ func (s *Server) Update(ctx context.Context, request *user_v1.UpdateRequest) (*e
 func (s *Server) Delete(ctx context.Context, request *user_v1.DeleteRequest) (*emptypb.Empty, error) {
 	s.logger.Debug().Msg(fmt.Sprintf("try delete user: %+v", request))
 
-	err := s.userRepo.Delete(ctx, &repositories.CRUDUserDeleteIn{Id: request.Id})
+	err := s.userRepo.Delete(ctx, &repositories.CRUDUserDeleteIn{ID: request.Id})
 	if err != nil {
 		s.logger.Err(err).Msg("не удалось удалить пользователя")
 		return &emptypb.Empty{}, status.Error(codes.Internal, "прошу понять и простить :(")

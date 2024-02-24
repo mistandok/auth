@@ -8,6 +8,6 @@ const (
 )
 
 var (
-	ErrUserNotFound = errors.New(errMsgUserNotFound)
-	ErrEmailIsTaken = errors.New(errMsgEmailIsTaken)
+	ErrUserNotFound = errors.New(errMsgUserNotFound) // ErrUserNotFound сигнальная ошибка в случае отсутствия пользователя.
+	ErrEmailIsTaken = errors.New(errMsgEmailIsTaken) // ErrEmailIsTaken сигнальная ошибка в случае дублирования email.
 )

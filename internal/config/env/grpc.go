@@ -1,8 +1,9 @@
 package env
 
 import (
-	"github.com/mistandok/auth/internal/config"
 	"os"
+
+	"github.com/mistandok/auth/internal/config"
 
 	"github.com/pkg/errors"
 )
@@ -12,12 +13,15 @@ const (
 	grpcPortEnvName = "GRPC_PORT"
 )
 
+// GRPCCfgSearcher searcher for grpc config.
 type GRPCCfgSearcher struct{}
 
+// NewGRPCCfgSearcher get instance for grpc config searcher.
 func NewGRPCCfgSearcher() *GRPCCfgSearcher {
 	return &GRPCCfgSearcher{}
 }
 
+// Get searcher for grpc config.
 func (s *GRPCCfgSearcher) Get() (*config.GRPCConfig, error) {
 	host := os.Getenv(grpcHostEnvName)
 	if len(host) == 0 {

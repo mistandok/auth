@@ -3,6 +3,10 @@ package main
 import (
 	"context"
 	"flag"
+	"log"
+	"net"
+	"os"
+
 	"github.com/mistandok/auth/internal/config"
 	"github.com/mistandok/auth/internal/config/env"
 	"github.com/mistandok/auth/internal/repositories/postgresql"
@@ -11,9 +15,6 @@ import (
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"log"
-	"net"
-	"os"
 )
 
 var configPath string
@@ -57,7 +58,7 @@ func main() {
 
 	logger := setupZeroLog(logConfig)
 
-	userRepo := postgresql.NewCRUDUser(pool, logger)
+	userRepo := postgresql.NewCRUDUserRepo(pool, logger)
 	userServer := server_v1.NewServer(logger, userRepo)
 
 	server := grpc.NewServer()

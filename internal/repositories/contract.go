@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// CRUDUserCreateIn params for create.
 type CRUDUserCreateIn struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
@@ -12,23 +13,27 @@ type CRUDUserCreateIn struct {
 	Role     string `json:"role"`
 }
 
+// CRUDUserCreateOut out params for create.
 type CRUDUserCreateOut struct {
-	Id int64 `json:"id"`
+	ID int64 `json:"id"`
 }
 
+// CRUDUserUpdateIn params for uodate
 type CRUDUserUpdateIn struct {
-	Id    int64   `json:"id"`
+	ID    int64   `json:"id"`
 	Name  *string `json:"name"`
 	Email *string `json:"email"`
 	Role  *string `json:"role"`
 }
 
+// CRUDUserGetIn params for get.
 type CRUDUserGetIn struct {
-	Id int64 `json:"id"`
+	ID int64 `json:"id"`
 }
 
+// CRUDUserGetOut out params for get.
 type CRUDUserGetOut struct {
-	Id        int64     `json:"id"`
+	ID        int64     `json:"id"`
 	Name      string    `json:"name"`
 	Email     string    `json:"email"`
 	Role      string    `json:"role"`
@@ -36,10 +41,12 @@ type CRUDUserGetOut struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
+// CRUDUserDeleteIn params for delete
 type CRUDUserDeleteIn struct {
-	Id int64 `json:"id"`
+	ID int64 `json:"id"`
 }
 
+// CRUDUserRepository interface for crud user repositories
 type CRUDUserRepository interface {
 	Create(context.Context, *CRUDUserCreateIn) (*CRUDUserCreateOut, error)
 	Update(context.Context, *CRUDUserUpdateIn) error

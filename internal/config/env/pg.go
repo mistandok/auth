@@ -1,9 +1,10 @@
 package env
 
 import (
-	"github.com/mistandok/auth/internal/config"
 	"os"
 	"strconv"
+
+	"github.com/mistandok/auth/internal/config"
 
 	"github.com/pkg/errors"
 )
@@ -12,16 +13,19 @@ const (
 	host     = "PG_HOST"
 	port     = "PG_PORT"
 	user     = "POSTGRES_USER"
-	password = "POSTGRES_PASSWORD"
+	password = "POSTGRES_PASSWORD" // #nosec G101
 	dbName   = "POSTGRES_DB"
 )
 
+// PgCfgSearcher searcher for PG config.
 type PgCfgSearcher struct{}
 
+// NewPgCfgSearcher get instance searcher for pg config.
 func NewPgCfgSearcher() *PgCfgSearcher {
 	return &PgCfgSearcher{}
 }
 
+// Get config for PG connection.
 func (s *PgCfgSearcher) Get() (*config.PgConfig, error) {
 	dbHost := os.Getenv(host)
 	if len(dbHost) == 0 {

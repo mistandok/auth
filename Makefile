@@ -15,7 +15,7 @@ install-deps:
 lint:
 	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/golangci-lint run ./... --config .golangci.pipeline.yaml
 
-fiximports:
+fix-imports:
 	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goimports -w .
 
 get-deps:

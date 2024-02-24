@@ -3,13 +3,15 @@ package postgresql
 import (
 	"context"
 	"fmt"
+	"log"
+
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/mistandok/auth/internal/config"
-	"log"
 )
 
+// MustInitPgConnection get gp connection pool or log fatal.
 func MustInitPgConnection(ctx context.Context, cfg config.PgConfig) (*pgxpool.Pool, func()) {
-	pgxConfig, err := pgxpool.ParseConfig(getPgUrl(cfg))
+	pgxConfig, err := pgxpool.ParseConfig(getPgURL(cfg))
 	if err != nil {
 		log.Fatalf("ошибка при формировании конфига для pgxpool: %v", err)
 	}
@@ -25,7 +27,7 @@ func MustInitPgConnection(ctx context.Context, cfg config.PgConfig) (*pgxpool.Po
 	return pool, closer
 }
 
-func getPgUrl(cfg config.PgConfig) string {
+func getPgURL(cfg config.PgConfig) string {
 	return fmt.Sprintf(
 		"postgres://%s:%s@%s:%d/%s",
 		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DbName,
