@@ -1,9 +1,7 @@
-version: '3.3'
+version: '3'
 
 volumes:
   postgres_volume:
-
-name: "auth_app_prod"
 
 services:
   storage:
