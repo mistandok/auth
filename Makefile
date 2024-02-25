@@ -13,7 +13,7 @@ setup-prod-env:
 
 LOCAL_BIN:=$(CURDIR)/bin
 
-MIGRATION_DIR=$(MIGRATION_DIR)
+CUR_MIGRATION_DIR=$(MIGRATION_DIR)
 MIGRATION_DSN="host=$(PG_HOST) port=$(PG_PORT) dbname=$(POSTGRES_DB) user=$(POSTGRES_USER) password=$(POSTGRES_PASSWORD) sslmode=disable"
 
 install-deps:
@@ -46,13 +46,18 @@ generate-user-api:
 	api/user_v1/user.proto
 
 migration-status:
-	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goose -dir ${MIGRATION_DIR} postgres ${MIGRATION_DSN} status -v
+	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goose -dir ${CUR_MIGRATION_DIR} postgres ${MIGRATION_DSN} status -v
 
 migration-up:
-	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goose -dir ${MIGRATION_DIR} postgres ${MIGRATION_DSN} up -v
+	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goose -dir ${CUR_MIGRATION_DIR} postgres ${MIGRATION_DSN} up -v
 
 migration-down:
-	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goose -dir ${MIGRATION_DIR} postgres ${MIGRATION_DSN} down -v
+	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goose -dir ${CUR_MIGRATION_DIR} postgres ${MIGRATION_DSN} down -v
+
+create-migration:
+	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goose -dir ${CUR_MIGRATION_DIR} create $(migration_name) sql
+
+local-create-new-migration: setup-local-env create-migration
 
 local-migration-status: setup-local-env migration-status
 
@@ -66,6 +71,8 @@ prod-migration-up: setup-prod-env migration-up
 
 prod-migration-down: setup-prod-env migration-down
 
+local-create-new-migration: setup-local-env create-migration
+
 local-down-app:
 	docker-compose --env-file deploy/env/.env.local -f docker-compose.local.yaml down -v
 
@@ -77,6 +84,3 @@ prod-down-app:
 
 prod-start-app:
 	docker-compose --env-file deploy/env/.env.prod -f docker-compose.prod.yaml up -d --build
-
-create-new-migration:
-	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} create $(migration_name) sql
