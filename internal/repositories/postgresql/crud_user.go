@@ -48,15 +48,20 @@ func (u *CRUDUserRepo) Create(ctx context.Context, in *repositories.CRUDUserCrea
 
 	rows, err := u.pool.Query(ctx, query, args)
 	if err != nil {
-		return &repositories.CRUDUserCreateOut{}, errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 	defer rows.Close()
 
 	out, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[repositories.CRUDUserCreateOut])
 	if err != nil {
 		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) && pgErr.ConstraintName == "user_email_key" {
-			return nil, repositories.ErrEmailIsTaken
+		if errors.As(err, &pgErr) {
+			switch {
+			case pgErr.ConstraintName == "user_email_key":
+				return nil, repositories.ErrEmailIsTaken
+			case pgErr.ConstraintName == "user_name_key":
+				return nil, repositories.ErrNameIsTaken
+			}
 		}
 		return nil, errors.WithStack(err)
 	}
