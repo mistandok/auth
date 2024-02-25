@@ -55,13 +55,8 @@ func (u *CRUDUserRepo) Create(ctx context.Context, in *repositories.CRUDUserCrea
 	out, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[repositories.CRUDUserCreateOut])
 	if err != nil {
 		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) {
-			switch {
-			case pgErr.ConstraintName == "user_email_key":
-				return nil, repositories.ErrEmailIsTaken
-			case pgErr.ConstraintName == "user_name_key":
-				return nil, repositories.ErrNameIsTaken
-			}
+		if errors.As(err, &pgErr) && pgErr.ConstraintName == "user_email_key" {
+			return nil, repositories.ErrEmailIsTaken
 		}
 		return nil, errors.WithStack(err)
 	}

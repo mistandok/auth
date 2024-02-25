@@ -51,7 +51,7 @@ func (s *Server) Create(ctx context.Context, request *user_v1.CreateRequest) (*u
 	})
 	if err != nil {
 		switch {
-		case errors.Is(err, repositories.ErrEmailIsTaken) || errors.Is(err, repositories.ErrNameIsTaken):
+		case errors.Is(err, repositories.ErrEmailIsTaken):
 			s.logger.Warn().Err(err).Msg("не удалось создать пользователя")
 			return &user_v1.CreateResponse{}, status.Error(codes.AlreadyExists, err.Error())
 		default:
