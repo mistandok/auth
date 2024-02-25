@@ -37,3 +37,4 @@ services:
       PG_HOST: storage
     ports:
       - "${GRPC_PORT}:${GRPC_PORT}"
+    restart: on-failure
