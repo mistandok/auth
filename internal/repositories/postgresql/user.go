@@ -131,17 +131,24 @@ func (u *UserRepo) Update(ctx context.Context, in *repositories.UserUpdateIn) er
 
 // Get user from db.
 func (u *UserRepo) Get(ctx context.Context, in *repositories.UserGetIn) (*repositories.UserGetOut, error) {
-	query := `
+	queryFormat := `
 	SELECT 
-	    id, name, email, role, created_at createdAt, updated_at updatedAt
+	    %s, %s, %s, %s, %s createdAt, %s updatedAt
 	FROM 
-	    "user"
+	    "%s"
 	WHERE
-	    id = @id
+	    %s = @%s
     `
 
+	query := fmt.Sprintf(
+		queryFormat,
+		idColumn, nameColumn, roleColumn, emailColumn, createdAtColumn, updatedAtColumn,
+		userTable,
+		idColumn, idColumn,
+	)
+
 	args := pgx.NamedArgs{
-		"id": in.ID,
+		idColumn: in.ID,
 	}
 
 	rows, err := u.pool.Query(ctx, query, args)
@@ -163,13 +170,19 @@ func (u *UserRepo) Get(ctx context.Context, in *repositories.UserGetIn) (*reposi
 
 // Delete user from db.
 func (u *UserRepo) Delete(ctx context.Context, in *repositories.UserDeleteIn) error {
-	query := `
-    	DELETE FROM "user"
-		WHERE id = @id
+	queryFormat := `
+    	DELETE FROM "%s"
+		WHERE %s = @%s
     `
 
+	query := fmt.Sprintf(
+		queryFormat,
+		userTable,
+		idColumn, idColumn,
+	)
+
 	args := pgx.NamedArgs{
-		"id": in.ID,
+		idColumn: in.ID,
 	}
 
 	_, err := u.pool.Exec(ctx, query, args)

@@ -100,14 +100,8 @@ func (s *Server) Update(ctx context.Context, request *user_v1.UpdateRequest) (*e
 		Role:  common.PointerRoleNameFromRole(request.Role),
 	})
 	if err != nil {
-		switch {
-		case errors.Is(err, repositories.ErrUserNotFound):
-			s.logger.Warn().Msg("не удалось обновить пользователя")
-			return nil, status.Error(codes.NotFound, err.Error())
-		default:
-			s.logger.Err(err).Msg("не удалось обновить пользователя")
-			return nil, status.Error(codes.Internal, "прошу понять и простить :(")
-		}
+		s.logger.Err(err).Msg("не удалось обновить пользователя")
+		return nil, status.Error(codes.Internal, "прошу понять и простить :(")
 	}
 
 	return &emptypb.Empty{}, nil
