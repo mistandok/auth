@@ -2,6 +2,7 @@ package postgresql
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -11,6 +12,17 @@ import (
 	"github.com/mistandok/auth/internal/repositories"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
+)
+
+const (
+	userTable              = "user"
+	nameColumn             = "name"
+	emailColumn            = "email"
+	passwordColumn         = "password"
+	roleColumn             = "role"
+	createdAtColumn        = "created_at"
+	updatedAtColumn        = "updated_at"
+	userEmailKeyConstraint = "user_email_key"
 )
 
 // UserRepo user repo for crud operation.
@@ -30,20 +42,25 @@ func NewUserRepo(pool *pgxpool.Pool, logger *zerolog.Logger) *UserRepo {
 // Create user in db.
 func (u *UserRepo) Create(ctx context.Context, in *repositories.UserCreateIn) (*repositories.UserCreateOut, error) {
 	query := `
-	INSERT INTO "user" (name, email, password, role, created_at, updated_at)
-	VALUES (@name, @email, @password, @role, @createdAt, @updatedAt)
+	INSERT INTO "%s" (%s, %s, %s, %s, %s, %s)
+	VALUES (@%s, @%s, @%s, @%s, @%s, @%s)
 	RETURNING id
 	`
+	query = fmt.Sprintf(
+		query,
+		userTable, nameColumn, emailColumn, roleColumn, passwordColumn, createdAtColumn, updatedAtColumn,
+		nameColumn, emailColumn, roleColumn, passwordColumn, createdAtColumn, updatedAtColumn,
+	)
 
 	currentTime := time.Now()
 
 	args := pgx.NamedArgs{
-		"name":      in.Name,
-		"email":     in.Email,
-		"role":      in.Role,
-		"password":  in.Password,
-		"createdAt": currentTime,
-		"updatedAt": currentTime,
+		nameColumn:      in.Name,
+		emailColumn:     in.Email,
+		roleColumn:      in.Role,
+		passwordColumn:  in.Password,
+		createdAtColumn: currentTime,
+		updatedAtColumn: currentTime,
 	}
 
 	rows, err := u.pool.Query(ctx, query, args)
@@ -55,7 +72,7 @@ func (u *UserRepo) Create(ctx context.Context, in *repositories.UserCreateIn) (*
 	out, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[repositories.UserCreateOut])
 	if err != nil {
 		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) && pgErr.ConstraintName == "user_email_key" {
+		if errors.As(err, &pgErr) && pgErr.ConstraintName == userEmailKeyConstraint {
 			return nil, repositories.ErrEmailIsTaken
 		}
 		return nil, errors.WithStack(err)

@@ -53,10 +53,10 @@ func (s *Server) Create(ctx context.Context, request *user_v1.CreateRequest) (*u
 		switch {
 		case errors.Is(err, repositories.ErrEmailIsTaken):
 			s.logger.Warn().Err(err).Msg("не удалось создать пользователя")
-			return &user_v1.CreateResponse{}, status.Error(codes.AlreadyExists, err.Error())
+			return nil, status.Error(codes.AlreadyExists, err.Error())
 		default:
 			s.logger.Err(err).Msg("не удалось создать пользователя")
-			return &user_v1.CreateResponse{}, status.Error(codes.Internal, "прошу понять и простить :(")
+			return nil, status.Error(codes.Internal, "прошу понять и простить :(")
 		}
 	}
 
@@ -72,10 +72,10 @@ func (s *Server) Get(ctx context.Context, request *user_v1.GetRequest) (*user_v1
 		switch {
 		case errors.Is(err, repositories.ErrUserNotFound):
 			s.logger.Warn().Msg("не удалось получить пользователя")
-			return &user_v1.GetResponse{}, status.Error(codes.NotFound, err.Error())
+			return nil, status.Error(codes.NotFound, err.Error())
 		default:
 			s.logger.Err(err).Msg("не удалось получить пользователя")
-			return &user_v1.GetResponse{}, status.Error(codes.Internal, "прошу понять и простить :(")
+			return nil, status.Error(codes.Internal, "прошу понять и простить :(")
 		}
 	}
 
@@ -103,10 +103,10 @@ func (s *Server) Update(ctx context.Context, request *user_v1.UpdateRequest) (*e
 		switch {
 		case errors.Is(err, repositories.ErrUserNotFound):
 			s.logger.Warn().Msg("не удалось обновить пользователя")
-			return &emptypb.Empty{}, status.Error(codes.NotFound, err.Error())
+			return nil, status.Error(codes.NotFound, err.Error())
 		default:
 			s.logger.Err(err).Msg("не удалось обновить пользователя")
-			return &emptypb.Empty{}, status.Error(codes.Internal, "прошу понять и простить :(")
+			return nil, status.Error(codes.Internal, "прошу понять и простить :(")
 		}
 	}
 
@@ -120,7 +120,7 @@ func (s *Server) Delete(ctx context.Context, request *user_v1.DeleteRequest) (*e
 	err := s.userRepo.Delete(ctx, &repositories.UserDeleteIn{ID: request.Id})
 	if err != nil {
 		s.logger.Err(err).Msg("не удалось удалить пользователя")
-		return &emptypb.Empty{}, status.Error(codes.Internal, "прошу понять и простить :(")
+		return nil, status.Error(codes.Internal, "прошу понять и простить :(")
 	}
 
 	return &emptypb.Empty{}, nil
