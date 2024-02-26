@@ -5,34 +5,42 @@ import (
 	"time"
 )
 
-// CRUDUserCreateIn params for create.
-type CRUDUserCreateIn struct {
+// UserRepository interface for crud user repositories
+type UserRepository interface {
+	Create(context.Context, *UserCreateIn) (*UserCreateOut, error)
+	Update(context.Context, *UserUpdateIn) error
+	Get(context.Context, *UserGetIn) (*UserGetOut, error)
+	Delete(context.Context, *UserDeleteIn) error
+}
+
+// UserCreateIn params for create.
+type UserCreateIn struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	Role     string `json:"role"`
 }
 
-// CRUDUserCreateOut out params for create.
-type CRUDUserCreateOut struct {
+// UserCreateOut out params for create.
+type UserCreateOut struct {
 	ID int64 `json:"id"`
 }
 
-// CRUDUserUpdateIn params for uodate
-type CRUDUserUpdateIn struct {
+// UserUpdateIn params for uodate
+type UserUpdateIn struct {
 	ID    int64   `json:"id"`
 	Name  *string `json:"name"`
 	Email *string `json:"email"`
 	Role  *string `json:"role"`
 }
 
-// CRUDUserGetIn params for get.
-type CRUDUserGetIn struct {
+// UserGetIn params for get.
+type UserGetIn struct {
 	ID int64 `json:"id"`
 }
 
-// CRUDUserGetOut out params for get.
-type CRUDUserGetOut struct {
+// UserGetOut out params for get.
+type UserGetOut struct {
 	ID        int64     `json:"id"`
 	Name      string    `json:"name"`
 	Email     string    `json:"email"`
@@ -41,15 +49,7 @@ type CRUDUserGetOut struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
-// CRUDUserDeleteIn params for delete
-type CRUDUserDeleteIn struct {
+// UserDeleteIn params for delete
+type UserDeleteIn struct {
 	ID int64 `json:"id"`
-}
-
-// CRUDUserRepository interface for crud user repositories
-type CRUDUserRepository interface {
-	Create(context.Context, *CRUDUserCreateIn) (*CRUDUserCreateOut, error)
-	Update(context.Context, *CRUDUserUpdateIn) error
-	Get(context.Context, *CRUDUserGetIn) (*CRUDUserGetOut, error)
-	Delete(context.Context, *CRUDUserDeleteIn) error
 }

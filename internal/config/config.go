@@ -7,6 +7,21 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// GRPCConfigSearcher interface for search grpc config
+type GRPCConfigSearcher interface {
+	Get() (*GRPCConfig, error)
+}
+
+// LogConfigSearcher interface for serach Log config.
+type LogConfigSearcher interface {
+	Get() (*LogConfig, error)
+}
+
+// PgConfigSearcher interface for search PG config.
+type PgConfigSearcher interface {
+	Get() (*PgConfig, error)
+}
+
 // Load dotenv from path to env
 func Load(path string) error {
 	err := godotenv.Load(path)
@@ -41,19 +56,4 @@ type PgConfig struct {
 	User     string
 	Password string
 	DbName   string
-}
-
-// GRPCConfigSearcher interface for search grpc config
-type GRPCConfigSearcher interface {
-	Get() (*GRPCConfig, error)
-}
-
-// LogConfigSearcher interface for serach Log config.
-type LogConfigSearcher interface {
-	Get() (*LogConfig, error)
-}
-
-// PgConfigSearcher interface for search PG config.
-type PgConfigSearcher interface {
-	Get() (*PgConfig, error)
 }

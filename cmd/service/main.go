@@ -58,7 +58,7 @@ func main() {
 
 	logger := setupZeroLog(logConfig)
 
-	userRepo := postgresql.NewCRUDUserRepo(pool, logger)
+	userRepo := postgresql.NewUserRepo(pool, logger)
 	userServer := server_v1.NewServer(logger, userRepo)
 
 	server := grpc.NewServer()

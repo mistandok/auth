@@ -13,22 +13,22 @@ import (
 	"github.com/rs/zerolog"
 )
 
-// CRUDUserRepo user repo for crud operation.
-type CRUDUserRepo struct {
+// UserRepo user repo for crud operation.
+type UserRepo struct {
 	pool   *pgxpool.Pool
 	logger *zerolog.Logger
 }
 
-// NewCRUDUserRepo  get new repo instance.
-func NewCRUDUserRepo(pool *pgxpool.Pool, logger *zerolog.Logger) *CRUDUserRepo {
-	return &CRUDUserRepo{
+// NewUserRepo  get new repo instance.
+func NewUserRepo(pool *pgxpool.Pool, logger *zerolog.Logger) *UserRepo {
+	return &UserRepo{
 		pool:   pool,
 		logger: logger,
 	}
 }
 
 // Create user in db.
-func (u *CRUDUserRepo) Create(ctx context.Context, in *repositories.CRUDUserCreateIn) (*repositories.CRUDUserCreateOut, error) {
+func (u *UserRepo) Create(ctx context.Context, in *repositories.UserCreateIn) (*repositories.UserCreateOut, error) {
 	query := `
 	INSERT INTO "user" (name, email, password, role, created_at, updated_at)
 	VALUES (@name, @email, @password, @role, @createdAt, @updatedAt)
@@ -52,7 +52,7 @@ func (u *CRUDUserRepo) Create(ctx context.Context, in *repositories.CRUDUserCrea
 	}
 	defer rows.Close()
 
-	out, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[repositories.CRUDUserCreateOut])
+	out, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[repositories.UserCreateOut])
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.ConstraintName == "user_email_key" {
@@ -65,7 +65,7 @@ func (u *CRUDUserRepo) Create(ctx context.Context, in *repositories.CRUDUserCrea
 }
 
 // Update user in db.
-func (u *CRUDUserRepo) Update(ctx context.Context, in *repositories.CRUDUserUpdateIn) error {
+func (u *UserRepo) Update(ctx context.Context, in *repositories.UserUpdateIn) error {
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 	params := make([]any, 0)
 
@@ -109,7 +109,7 @@ func (u *CRUDUserRepo) Update(ctx context.Context, in *repositories.CRUDUserUpda
 }
 
 // Get user from db.
-func (u *CRUDUserRepo) Get(ctx context.Context, in *repositories.CRUDUserGetIn) (*repositories.CRUDUserGetOut, error) {
+func (u *UserRepo) Get(ctx context.Context, in *repositories.UserGetIn) (*repositories.UserGetOut, error) {
 	query := `
 	SELECT 
 	    id, name, email, role, created_at createdAt, updated_at updatedAt
@@ -125,23 +125,23 @@ func (u *CRUDUserRepo) Get(ctx context.Context, in *repositories.CRUDUserGetIn) 
 
 	rows, err := u.pool.Query(ctx, query, args)
 	if err != nil {
-		return &repositories.CRUDUserGetOut{}, errors.WithStack(err)
+		return nil, err
 	}
 	defer rows.Close()
 
-	out, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[repositories.CRUDUserGetOut])
+	out, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[repositories.UserGetOut])
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, repositories.ErrUserNotFound
 		}
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	return &out, nil
 }
 
 // Delete user from db.
-func (u *CRUDUserRepo) Delete(ctx context.Context, in *repositories.CRUDUserDeleteIn) error {
+func (u *UserRepo) Delete(ctx context.Context, in *repositories.UserDeleteIn) error {
 	query := `
     	DELETE FROM "user"
 		WHERE id = @id
@@ -153,7 +153,7 @@ func (u *CRUDUserRepo) Delete(ctx context.Context, in *repositories.CRUDUserDele
 
 	_, err := u.pool.Exec(ctx, query, args)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	return nil

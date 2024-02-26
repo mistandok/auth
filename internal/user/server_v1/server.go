@@ -18,10 +18,10 @@ import (
 
 // CRUDUserRepo interface for crud user repo in server.
 type CRUDUserRepo interface {
-	Create(context.Context, *repositories.CRUDUserCreateIn) (*repositories.CRUDUserCreateOut, error)
-	Update(context.Context, *repositories.CRUDUserUpdateIn) error
-	Get(context.Context, *repositories.CRUDUserGetIn) (*repositories.CRUDUserGetOut, error)
-	Delete(context.Context, *repositories.CRUDUserDeleteIn) error
+	Create(context.Context, *repositories.UserCreateIn) (*repositories.UserCreateOut, error)
+	Update(context.Context, *repositories.UserUpdateIn) error
+	Get(context.Context, *repositories.UserGetIn) (*repositories.UserGetOut, error)
+	Delete(context.Context, *repositories.UserDeleteIn) error
 }
 
 // Server user Server.
@@ -43,7 +43,7 @@ func NewServer(logger *zerolog.Logger, userRepo CRUDUserRepo) *Server {
 func (s *Server) Create(ctx context.Context, request *user_v1.CreateRequest) (*user_v1.CreateResponse, error) {
 	s.logger.Debug().Msg(fmt.Sprintf("try create user: %+v", request))
 
-	out, err := s.userRepo.Create(ctx, &repositories.CRUDUserCreateIn{
+	out, err := s.userRepo.Create(ctx, &repositories.UserCreateIn{
 		Name:     request.Name,
 		Email:    request.Email,
 		Password: request.Password,
@@ -67,7 +67,7 @@ func (s *Server) Create(ctx context.Context, request *user_v1.CreateRequest) (*u
 func (s *Server) Get(ctx context.Context, request *user_v1.GetRequest) (*user_v1.GetResponse, error) {
 	s.logger.Debug().Msg(fmt.Sprintf("try get user: %+v", request))
 
-	out, err := s.userRepo.Get(ctx, &repositories.CRUDUserGetIn{ID: request.Id})
+	out, err := s.userRepo.Get(ctx, &repositories.UserGetIn{ID: request.Id})
 	if err != nil {
 		switch {
 		case errors.Is(err, repositories.ErrUserNotFound):
@@ -93,7 +93,7 @@ func (s *Server) Get(ctx context.Context, request *user_v1.GetRequest) (*user_v1
 func (s *Server) Update(ctx context.Context, request *user_v1.UpdateRequest) (*emptypb.Empty, error) {
 	s.logger.Debug().Msg(fmt.Sprintf("try update user: %+v", request))
 
-	err := s.userRepo.Update(ctx, &repositories.CRUDUserUpdateIn{
+	err := s.userRepo.Update(ctx, &repositories.UserUpdateIn{
 		ID:    request.Id,
 		Name:  request.Name,
 		Email: request.Email,
@@ -117,7 +117,7 @@ func (s *Server) Update(ctx context.Context, request *user_v1.UpdateRequest) (*e
 func (s *Server) Delete(ctx context.Context, request *user_v1.DeleteRequest) (*emptypb.Empty, error) {
 	s.logger.Debug().Msg(fmt.Sprintf("try delete user: %+v", request))
 
-	err := s.userRepo.Delete(ctx, &repositories.CRUDUserDeleteIn{ID: request.Id})
+	err := s.userRepo.Delete(ctx, &repositories.UserDeleteIn{ID: request.Id})
 	if err != nil {
 		s.logger.Err(err).Msg("не удалось удалить пользователя")
 		return &emptypb.Empty{}, status.Error(codes.Internal, "прошу понять и простить :(")
