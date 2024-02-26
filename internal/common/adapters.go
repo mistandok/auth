@@ -17,7 +17,7 @@ func PointerRoleNameFromRole(role *user_v1.Role) *string {
 		return nil
 	}
 
-	roleName := user_v1.Role_name[int32(*role)]
+	roleName := RoleNameFromRole(*role)
 
 	return &roleName
 }
