@@ -3,9 +3,9 @@ package postgresql
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
-	"github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -23,6 +23,7 @@ const (
 	createdAtColumn        = "created_at"
 	updatedAtColumn        = "updated_at"
 	userEmailKeyConstraint = "user_email_key"
+	idColumn               = "id"
 )
 
 // UserRepo user repo for crud operation.
@@ -41,13 +42,13 @@ func NewUserRepo(pool *pgxpool.Pool, logger *zerolog.Logger) *UserRepo {
 
 // Create user in db.
 func (u *UserRepo) Create(ctx context.Context, in *repositories.UserCreateIn) (*repositories.UserCreateOut, error) {
-	query := `
+	queryFormat := `
 	INSERT INTO "%s" (%s, %s, %s, %s, %s, %s)
 	VALUES (@%s, @%s, @%s, @%s, @%s, @%s)
 	RETURNING id
 	`
-	query = fmt.Sprintf(
-		query,
+	query := fmt.Sprintf(
+		queryFormat,
 		userTable, nameColumn, emailColumn, roleColumn, passwordColumn, createdAtColumn, updatedAtColumn,
 		nameColumn, emailColumn, roleColumn, passwordColumn, createdAtColumn, updatedAtColumn,
 	)
@@ -83,44 +84,47 @@ func (u *UserRepo) Create(ctx context.Context, in *repositories.UserCreateIn) (*
 
 // Update user in db.
 func (u *UserRepo) Update(ctx context.Context, in *repositories.UserUpdateIn) error {
-	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
-	params := make([]any, 0)
+	queryFormat := `
+		UPDATE "%s"
+		SET %s
+		WHERE %s=@%s
+    `
 
-	query := psql.Update("\"user\"")
+	setParams := make([]string, 0)
+	setFormat := "%s=@%s"
+	namedArgs := make(pgx.NamedArgs)
 
 	if in.Name != nil {
-		query = query.Set("name", "?")
-		params = append(params, *in.Name)
+		setParams = append(setParams, fmt.Sprintf(setFormat, nameColumn, nameColumn))
+		namedArgs[nameColumn] = in.Name
 	}
 
 	if in.Role != nil {
-		query = query.Set("role", "?")
-		params = append(params, *in.Role)
+		setParams = append(setParams, fmt.Sprintf(setFormat, roleColumn, roleColumn))
+		namedArgs[roleColumn] = in.Role
 	}
 
 	if in.Email != nil {
-		query = query.Set("email", "?")
-		params = append(params, *in.Email)
+		setParams = append(setParams, fmt.Sprintf(setFormat, emailColumn, emailColumn))
+		namedArgs[emailColumn] = in.Email
 	}
 
-	query = query.Set("updated_at", "?")
-	params = append(params, time.Now())
+	isNeedUpdate := len(namedArgs) > 0
 
-	query = query.Where(squirrel.Eq{"id": "?"})
-	params = append(params, in.ID)
-
-	query = query.Suffix("RETURNING \"id\"")
-
-	sql, _, err := query.ToSql()
-	if err != nil {
-		return errors.WithStack(err)
+	if !isNeedUpdate {
+		return nil
 	}
 
-	row := u.pool.QueryRow(ctx, sql, params...)
-	var userID int64
-	if err = row.Scan(&userID); errors.Is(err, pgx.ErrNoRows) {
-		return repositories.ErrUserNotFound
-	}
+	namedArgs[idColumn] = in.ID
+
+	setParams = append(setParams, fmt.Sprintf(setFormat, updatedAtColumn, updatedAtColumn))
+	namedArgs[updatedAtColumn] = time.Now()
+
+	setParamsStr := strings.Join(setParams, ", ")
+
+	query := fmt.Sprintf(queryFormat, userTable, setParamsStr, idColumn, idColumn)
+
+	_, err := u.pool.Exec(ctx, query, namedArgs)
 
 	return err
 }
