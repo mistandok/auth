@@ -2,10 +2,10 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS "user" (
     id BIGSERIAL PRIMARY KEY,
-    name text NOT NULL,
-    email text UNIQUE NOT NUll,
-    password text NOT NULL,
-    role text NOT NULL,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NUll,
+    password TEXT NOT NULL,
+    role TEXT NOT NULL,
     created_at timestamp with time zone default current_timestamp NOT NULL,
     updated_at timestamp with time zone default current_timestamp NOT NULL
 );
