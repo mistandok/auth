@@ -1,0 +1,25 @@
+version: '3'
+
+volumes:
+  postgres_volume:
+
+services:
+  storage:
+    image: postgres:16.1
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    env_file:
+      - deploy/env/.env.local
+    ports:
+      - "${PG_PORT}:${PG_PORT}"
+    command: -p ${PG_PORT}
+
+  migrator:
+    build:
+      dockerfile: deploy/dockerfiles/migrator.Dockerfile
+    env_file:
+      - deploy/env/.env.local
+    depends_on:
+      - storage
+    environment:
+      PG_HOST: storage

@@ -1,31 +1,65 @@
 package main
 
 import (
-	"fmt"
+	"context"
+	"flag"
 	"log"
 	"net"
 	"os"
-	"strconv"
-	"time"
 
-	"github.com/joho/godotenv"
-	"github.com/mistandok/auth/internal/user"
+	"github.com/mistandok/auth/internal/config"
+	"github.com/mistandok/auth/internal/config/env"
+	"github.com/mistandok/auth/internal/repositories/postgresql"
+	"github.com/mistandok/auth/internal/user/server_v1"
 	"github.com/mistandok/auth/pkg/user_v1"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
-const envName = ".env.example"
+var configPath string
+
+func init() {
+	flag.StringVar(&configPath, "config", ".env", "path to config file")
+	flag.Parse()
+}
 
 func main() {
-	envs := mustGetEnvs(envName)
-	grpcPort := mustFetchGRPCPort(envs)
-	logLevel := mustFetchLogLevel(envs)
-	listener := mustGetListener(grpcPort)
+	ctx := context.Background()
 
-	logger := setupZeroLog(logLevel, time.RFC3339)
-	userServer := user.NewServer(logger)
+	err := config.Load(configPath)
+	if err != nil {
+		log.Fatalf("ошибка при получении переменных окружения: %v", err)
+	}
+
+	grpcConfig, err := env.NewGRPCCfgSearcher().Get()
+	if err != nil {
+		log.Fatalf("ошибка при получении конфига grpc: %v", err)
+	}
+
+	logConfig, err := env.NewLogCfgSearcher().Get()
+	if err != nil {
+		log.Fatalf("ошибка при получении уровня логирования: %v", err)
+	}
+
+	pgConfig, err := env.NewPgCfgSearcher().Get()
+	if err != nil {
+		log.Fatalf("ошибка при получении конфига DB: %v", err)
+	}
+
+	pool, connCloser := postgresql.MustInitPgConnection(ctx, *pgConfig)
+	defer connCloser()
+
+	listenConfig := net.ListenConfig{}
+	listener, err := listenConfig.Listen(ctx, "tcp", grpcConfig.Address())
+	if err != nil {
+		log.Fatalf("ошибка при прослушивании: %v", err)
+	}
+
+	logger := setupZeroLog(logConfig)
+
+	userRepo := postgresql.NewUserRepo(pool, logger)
+	userServer := server_v1.NewServer(logger, userRepo)
 
 	server := grpc.NewServer()
 	reflection.Register(server)
@@ -38,57 +72,11 @@ func main() {
 	}
 }
 
-func mustGetEnvs(env string) map[string]string {
-	envs, err := godotenv.Read(env)
-	if err != nil {
-		log.Fatalf("не удалось прочитать переменные окружения: %v", err)
-	}
-
-	return envs
-}
-
-func mustFetchGRPCPort(envs map[string]string) int {
-	name := "GRPC_PORT"
-	portStr, ok := envs[name]
-	if !ok {
-		log.Fatalf("не задана переменная окружения: %s", name)
-	}
-
-	port, err := strconv.Atoi(portStr)
-	if err != nil {
-		log.Fatalf("некорректное значение для переменной окружения %s, err: %v", name, err)
-	}
-
-	return port
-}
-
-func mustGetListener(port int) net.Listener {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
-	if err != nil {
-		log.Fatalf("ошибка при прослушивании: %v", err)
-	}
-
-	return lis
-}
-
-func mustFetchLogLevel(envs map[string]string) zerolog.Level {
-	name := "LOG_LEVEL"
-	logLevelStr, ok := envs[name]
-	if !ok {
-		log.Fatalf("не задана переменная окружения: %s", name)
-	}
-	logLevelInt, err := strconv.Atoi(logLevelStr)
-	if err != nil {
-		log.Fatalf("некорректное значение для переменной окружения %s, err: %v", name, err)
-	}
-	return zerolog.Level(logLevelInt)
-}
-
-func setupZeroLog(logLevel zerolog.Level, timeFormat string) *zerolog.Logger {
-	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: timeFormat}
+func setupZeroLog(logConfig *config.LogConfig) *zerolog.Logger {
+	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: logConfig.TimeFormat}
 	logger := zerolog.New(output).With().Timestamp().Logger()
-	zerolog.SetGlobalLevel(logLevel)
-	zerolog.TimeFieldFormat = timeFormat
+	zerolog.SetGlobalLevel(logConfig.LogLevel)
+	zerolog.TimeFieldFormat = logConfig.TimeFormat
 
 	return &logger
 }
