@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/mistandok/auth/internal/client/db"
+
 	"github.com/jackc/pgx/v5"
 	serviceModel "github.com/mistandok/auth/internal/model"
 	"github.com/mistandok/auth/internal/repository"
@@ -30,11 +32,16 @@ func (u *Repo) Get(ctx context.Context, userID serviceModel.UserID) (*serviceMod
 		idColumn, idColumn,
 	)
 
+	q := db.Query{
+		Name:     "user_repository.Get",
+		QueryRaw: query,
+	}
+
 	args := pgx.NamedArgs{
 		idColumn: int64(userID),
 	}
 
-	rows, err := u.pool.Query(ctx, query, args)
+	rows, err := u.db.DB().QueryContext(ctx, q, args)
 	if err != nil {
 		return nil, err
 	}

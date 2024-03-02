@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/mistandok/auth/internal/client/db"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	serviceModel "github.com/mistandok/auth/internal/model"
@@ -25,6 +27,11 @@ func (u *Repo) Create(ctx context.Context, in *serviceModel.UserForCreate) (serv
 		nameColumn, emailColumn, roleColumn, passwordColumn, createdAtColumn, updatedAtColumn,
 	)
 
+	q := db.Query{
+		Name:     "user_repository.Create",
+		QueryRaw: query,
+	}
+
 	currentTime := time.Now()
 
 	args := pgx.NamedArgs{
@@ -36,7 +43,7 @@ func (u *Repo) Create(ctx context.Context, in *serviceModel.UserForCreate) (serv
 		updatedAtColumn: currentTime,
 	}
 
-	rows, err := u.pool.Query(ctx, query, args)
+	rows, err := u.db.DB().QueryContext(ctx, q, args)
 	if err != nil {
 		return 0, err
 	}

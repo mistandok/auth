@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/mistandok/auth/internal/client/db"
+
 	"github.com/jackc/pgx/v5"
 	serviceModel "github.com/mistandok/auth/internal/model"
 )
@@ -21,11 +23,16 @@ func (u *Repo) Delete(ctx context.Context, userID serviceModel.UserID) error {
 		idColumn, idColumn,
 	)
 
+	q := db.Query{
+		Name:     "user_repository.Delete",
+		QueryRaw: query,
+	}
+
 	args := pgx.NamedArgs{
 		idColumn: int64(userID),
 	}
 
-	_, err := u.pool.Exec(ctx, query, args)
+	_, err := u.db.DB().ExecContext(ctx, q, args)
 	if err != nil {
 		return err
 	}

@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mistandok/auth/internal/client/db"
+
 	"github.com/jackc/pgx/v5"
 	serviceModel "github.com/mistandok/auth/internal/model"
 	"github.com/mistandok/auth/internal/repository/user/convert"
@@ -55,7 +57,12 @@ func (u *Repo) Update(ctx context.Context, user *serviceModel.UserForUpdate) err
 
 	query := fmt.Sprintf(queryFormat, userTable, setParamsStr, idColumn, idColumn)
 
-	_, err := u.pool.Exec(ctx, query, namedArgs)
+	q := db.Query{
+		Name:     "user_repository.Update",
+		QueryRaw: query,
+	}
+
+	_, err := u.db.DB().ExecContext(ctx, q, namedArgs)
 
 	return err
 }
