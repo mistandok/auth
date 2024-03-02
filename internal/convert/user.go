@@ -58,12 +58,14 @@ func ToServiceRoleFromRole(role user_v1.Role) serviceModel.UserRole {
 	return serviceModel.UserRole(roleName)
 }
 
+// ToRoleFromServiceRole ..
 func ToRoleFromServiceRole(role serviceModel.UserRole) user_v1.Role {
 	resultRole := user_v1.Role_value[string(role)]
 
 	return user_v1.Role(resultRole)
 }
 
+// ToGetResponseFromServiceUser ..
 func ToGetResponseFromServiceUser(user *serviceModel.User) *user_v1.GetResponse {
 	return &user_v1.GetResponse{
 		Id:        int64(user.ID),

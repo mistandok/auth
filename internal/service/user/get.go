@@ -2,9 +2,11 @@ package user
 
 import (
 	"context"
+
 	"github.com/mistandok/auth/internal/model"
 )
 
+// Get ..
 func (s *Service) Get(ctx context.Context, userID model.UserID) (*model.User, error) {
 	user, err := s.userRepo.Get(ctx, userID)
 	if err != nil {

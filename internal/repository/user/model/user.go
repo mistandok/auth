@@ -2,6 +2,7 @@ package model
 
 import "time"
 
+// User ..
 type User struct {
 	ID        int64
 	Name      string
@@ -11,6 +12,7 @@ type User struct {
 	UpdatedAt time.Time
 }
 
+// UserForCreate ..
 type UserForCreate struct {
 	Name     string
 	Email    string
@@ -18,6 +20,7 @@ type UserForCreate struct {
 	Role     string
 }
 
+// UserForUpdate ..
 type UserForUpdate struct {
 	ID    int64
 	Name  *string

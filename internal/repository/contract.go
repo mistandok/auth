@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	serviceModel "github.com/mistandok/auth/internal/model"
 )
 

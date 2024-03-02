@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+
 	"github.com/mistandok/auth/internal/convert"
 	serviceModel "github.com/mistandok/auth/internal/model"
 	"github.com/mistandok/auth/internal/repository"
@@ -26,6 +27,7 @@ func NewImplementation(userService service.UserService) *Implementation {
 	}
 }
 
+// Create ..
 func (i *Implementation) Create(ctx context.Context, request *user_v1.CreateRequest) (*user_v1.CreateResponse, error) {
 	userForCreate := convert.ToServiceUserForCreateFromCreateRequest(request)
 	userID, err := i.userService.Create(ctx, userForCreate)

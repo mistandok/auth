@@ -3,9 +3,11 @@ package user
 import (
 	"context"
 	"fmt"
+
 	"github.com/mistandok/auth/internal/model"
 )
 
+// Create ..
 func (s *Service) Create(ctx context.Context, userForCreate *model.UserForCreate) (model.UserID, error) {
 	userID, err := s.userRepo.Create(ctx, userForCreate)
 	if err != nil {

@@ -3,13 +3,14 @@ package main
 import (
 	"context"
 	"flag"
+	"log"
+	"net"
+	"os"
+
 	userImpl "github.com/mistandok/auth/internal/api/user"
 	postgresql2 "github.com/mistandok/auth/internal/repository/postgresql"
 	"github.com/mistandok/auth/internal/repository/user"
 	userService "github.com/mistandok/auth/internal/service/user"
-	"log"
-	"net"
-	"os"
 
 	"github.com/mistandok/auth/internal/config"
 	"github.com/mistandok/auth/internal/config/env"

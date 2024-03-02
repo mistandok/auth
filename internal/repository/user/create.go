@@ -3,12 +3,13 @@ package user
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	serviceModel "github.com/mistandok/auth/internal/model"
 	"github.com/mistandok/auth/internal/repository"
 	"github.com/pkg/errors"
-	"time"
 )
 
 // Create user in db.

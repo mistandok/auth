@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"fmt"
+
 	"github.com/jackc/pgx/v5"
 	serviceModel "github.com/mistandok/auth/internal/model"
 )

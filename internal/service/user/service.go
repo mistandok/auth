@@ -8,11 +8,13 @@ import (
 
 var _ service.UserService = (*Service)(nil)
 
+// Service ..
 type Service struct {
 	logger   *zerolog.Logger
 	userRepo repository.UserRepository
 }
 
+// NewService ..
 func NewService(logger *zerolog.Logger, userRepository repository.UserRepository) *Service {
 	return &Service{
 		logger:   logger,
