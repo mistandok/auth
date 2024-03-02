@@ -3,14 +3,16 @@ package main
 import (
 	"context"
 	"flag"
+	userImpl "github.com/mistandok/auth/internal/api/user"
+	postgresql2 "github.com/mistandok/auth/internal/repository/postgresql"
+	"github.com/mistandok/auth/internal/repository/user"
+	userService "github.com/mistandok/auth/internal/service/user"
 	"log"
 	"net"
 	"os"
 
 	"github.com/mistandok/auth/internal/config"
 	"github.com/mistandok/auth/internal/config/env"
-	"github.com/mistandok/auth/internal/repositories/postgresql"
-	"github.com/mistandok/auth/internal/user/server_v1"
 	"github.com/mistandok/auth/pkg/user_v1"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
@@ -47,7 +49,7 @@ func main() {
 		log.Fatalf("ошибка при получении конфига DB: %v", err)
 	}
 
-	pool, connCloser := postgresql.MustInitPgConnection(ctx, *pgConfig)
+	pool, connCloser := postgresql2.MustInitPgConnection(ctx, *pgConfig)
 	defer connCloser()
 
 	listenConfig := net.ListenConfig{}
@@ -58,12 +60,13 @@ func main() {
 
 	logger := setupZeroLog(logConfig)
 
-	userRepo := postgresql.NewUserRepo(pool, logger)
-	userServer := server_v1.NewServer(logger, userRepo)
+	userRepo := user.NewRepo(pool, logger)
+	userServ := userService.NewService(logger, userRepo)
+	userImplServer := userImpl.NewImplementation(userServ)
 
 	server := grpc.NewServer()
 	reflection.Register(server)
-	user_v1.RegisterUserV1Server(server, userServer)
+	user_v1.RegisterUserV1Server(server, userImplServer)
 
 	log.Printf("сервер запущен на %v", listener.Addr())
 

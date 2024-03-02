@@ -1,6 +1,6 @@
-package repositories
+package repository
 
-import "github.com/pkg/errors"
+import "errors"
 
 const (
 	errMsgUserNotFound = "пользователь не найден"
