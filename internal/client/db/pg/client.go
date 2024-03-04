@@ -2,10 +2,10 @@ package pg
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/mistandok/auth/internal/client/db"
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 )
 
@@ -18,12 +18,12 @@ type pgClient struct {
 func New(ctx context.Context, dsn string, logger *zerolog.Logger) (db.Client, error) {
 	pgxConfig, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
-		return nil, errors.Errorf("ошибка при формировании конфига для pgxpool: %v", err)
+		return nil, fmt.Errorf("ошибка при формировании конфига для pgxpool: %v", err)
 	}
 
 	pool, err := pgxpool.NewWithConfig(ctx, pgxConfig)
 	if err != nil {
-		return nil, errors.Errorf("ошибка при подключении к БД: %v", err)
+		return nil, fmt.Errorf("ошибка при подключении к БД: %v", err)
 	}
 
 	return &pgClient{

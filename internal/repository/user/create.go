@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -11,11 +12,10 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	serviceModel "github.com/mistandok/auth/internal/model"
 	"github.com/mistandok/auth/internal/repository"
-	"github.com/pkg/errors"
 )
 
 // Create user in db.
-func (u *Repo) Create(ctx context.Context, in *serviceModel.UserForCreate) (serviceModel.UserID, error) {
+func (u *Repo) Create(ctx context.Context, in *serviceModel.UserForCreate) (int64, error) {
 	queryFormat := `
 	INSERT INTO "%s" (%s, %s, %s, %s, %s, %s)
 	VALUES (@%s, @%s, @%s, @%s, @%s, @%s)
@@ -49,9 +49,9 @@ func (u *Repo) Create(ctx context.Context, in *serviceModel.UserForCreate) (serv
 	}
 	defer rows.Close()
 
-	var userID serviceModel.UserID
+	var userID int64
 
-	userID, err = pgx.CollectOneRow(rows, pgx.RowTo[serviceModel.UserID])
+	userID, err = pgx.CollectOneRow(rows, pgx.RowTo[int64])
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.ConstraintName == userEmailKeyConstraint {

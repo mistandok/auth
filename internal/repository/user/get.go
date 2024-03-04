@@ -15,7 +15,7 @@ import (
 )
 
 // Get user from db.
-func (u *Repo) Get(ctx context.Context, userID serviceModel.UserID) (*serviceModel.User, error) {
+func (u *Repo) Get(ctx context.Context, userID int64) (*serviceModel.User, error) {
 	queryFormat := `
 	SELECT 
 	    %s, %s, %s, %s, %s createdAt, %s updatedAt
@@ -38,7 +38,7 @@ func (u *Repo) Get(ctx context.Context, userID serviceModel.UserID) (*serviceMod
 	}
 
 	args := pgx.NamedArgs{
-		idColumn: int64(userID),
+		idColumn: userID,
 	}
 
 	rows, err := u.db.DB().QueryContext(ctx, q, args)

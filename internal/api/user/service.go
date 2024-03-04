@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	"github.com/mistandok/auth/internal/convert"
-	serviceModel "github.com/mistandok/auth/internal/model"
 	"github.com/mistandok/auth/internal/repository"
 	"github.com/mistandok/auth/internal/service"
 	"github.com/mistandok/auth/pkg/user_v1"
@@ -13,6 +12,10 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
+
+const msgInternalError = "что-то пошло не так, мы уже работаем над решением проблемы"
+
+var errInternal = errors.New(msgInternalError)
 
 // Implementation user Server.
 type Implementation struct {
@@ -29,14 +32,13 @@ func NewImplementation(userService service.UserService) *Implementation {
 
 // Create ..
 func (i *Implementation) Create(ctx context.Context, request *user_v1.CreateRequest) (*user_v1.CreateResponse, error) {
-	userForCreate := convert.ToServiceUserForCreateFromCreateRequest(request)
-	userID, err := i.userService.Create(ctx, userForCreate)
+	userID, err := i.userService.Create(ctx, convert.ToServiceUserForCreateFromCreateRequest(request))
 	if err != nil {
 		switch {
 		case errors.Is(err, repository.ErrEmailIsTaken):
 			return nil, status.Error(codes.AlreadyExists, repository.ErrEmailIsTaken.Error())
 		default:
-			return nil, status.Error(codes.Internal, "прошу понять и простить :(")
+			return nil, errInternal
 		}
 	}
 
@@ -45,14 +47,13 @@ func (i *Implementation) Create(ctx context.Context, request *user_v1.CreateRequ
 
 // Get user by params
 func (i *Implementation) Get(ctx context.Context, request *user_v1.GetRequest) (*user_v1.GetResponse, error) {
-
-	user, err := i.userService.Get(ctx, serviceModel.UserID(request.Id))
+	user, err := i.userService.Get(ctx, request.Id)
 	if err != nil {
 		switch {
 		case errors.Is(err, repository.ErrUserNotFound):
 			return nil, status.Error(codes.NotFound, repository.ErrUserNotFound.Error())
 		default:
-			return nil, status.Error(codes.Internal, "прошу понять и простить :(")
+			return nil, errInternal
 		}
 	}
 
@@ -63,7 +64,7 @@ func (i *Implementation) Get(ctx context.Context, request *user_v1.GetRequest) (
 func (i *Implementation) Update(ctx context.Context, request *user_v1.UpdateRequest) (*emptypb.Empty, error) {
 	err := i.userService.Update(ctx, convert.ToServiceUserForUpdateFromUpdateRequest(request))
 	if err != nil {
-		return nil, status.Error(codes.Internal, "прошу понять и простить :(")
+		return nil, errInternal
 	}
 
 	return &emptypb.Empty{}, nil
@@ -71,9 +72,9 @@ func (i *Implementation) Update(ctx context.Context, request *user_v1.UpdateRequ
 
 // Delete user by params.
 func (i *Implementation) Delete(ctx context.Context, request *user_v1.DeleteRequest) (*emptypb.Empty, error) {
-	err := i.userService.Delete(ctx, serviceModel.UserID(request.Id))
+	err := i.userService.Delete(ctx, request.Id)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "прошу понять и простить :(")
+		return nil, errInternal
 	}
 
 	return &emptypb.Empty{}, nil

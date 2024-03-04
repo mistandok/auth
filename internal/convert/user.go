@@ -10,9 +10,9 @@ import (
 // ToServiceUserForCreateFromCreateRequest ..
 func ToServiceUserForCreateFromCreateRequest(request *user_v1.CreateRequest) *serviceModel.UserForCreate {
 	return &serviceModel.UserForCreate{
-		Name:     serviceModel.UserName(request.Name),
+		Name:     request.Name,
 		Email:    serviceModel.UserEmail(request.Email),
-		Password: serviceModel.Password(request.Password),
+		Password: request.Password,
 		Role:     ToServiceRoleFromRole(request.Role),
 	}
 }
@@ -20,31 +20,25 @@ func ToServiceUserForCreateFromCreateRequest(request *user_v1.CreateRequest) *se
 // ToServiceUserForUpdateFromUpdateRequest ..
 func ToServiceUserForUpdateFromUpdateRequest(request *user_v1.UpdateRequest) *serviceModel.UserForUpdate {
 	var (
-		name  *serviceModel.UserName
+		name  *string
 		email *serviceModel.UserEmail
 		role  *serviceModel.UserRole
 	)
 
-	if request.Name == nil {
-		name = nil
-	} else {
-		name = common.Pointer[serviceModel.UserName](serviceModel.UserName(*request.Name))
+	if request.Name != nil {
+		name = common.Pointer[string](*request.Name)
 	}
 
-	if request.Email == nil {
-		email = nil
-	} else {
+	if request.Email != nil {
 		email = common.Pointer[serviceModel.UserEmail](serviceModel.UserEmail(*request.Email))
 	}
 
-	if request.Role == nil {
-		role = nil
-	} else {
+	if request.Role != nil {
 		role = common.Pointer[serviceModel.UserRole](ToServiceRoleFromRole(*request.Role))
 	}
 
 	return &serviceModel.UserForUpdate{
-		ID:    serviceModel.UserID(request.Id),
+		ID:    request.Id,
 		Name:  name,
 		Email: email,
 		Role:  role,
@@ -68,8 +62,8 @@ func ToRoleFromServiceRole(role serviceModel.UserRole) user_v1.Role {
 // ToGetResponseFromServiceUser ..
 func ToGetResponseFromServiceUser(user *serviceModel.User) *user_v1.GetResponse {
 	return &user_v1.GetResponse{
-		Id:        int64(user.ID),
-		Name:      string(user.Name),
+		Id:        user.ID,
+		Name:      user.Name,
 		Email:     string(user.Email),
 		Role:      ToRoleFromServiceRole(user.Role),
 		CreatedAt: timestamppb.New(user.CreatedAt),

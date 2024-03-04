@@ -2,20 +2,11 @@ package model
 
 import "time"
 
-// UserID идентификатор пользователя
-type UserID int64
-
-// UserName имя пользователя
-type UserName string
-
 // UserEmail email пользователя
 type UserEmail string
 
 // UserRole роль пользователя
 type UserRole string
-
-// Password пароль пользователя
-type Password string
 
 const (
 	UNKNOWN UserRole = "UNKNOWN" // UNKNOWN неизвестный тип пользователя
@@ -25,8 +16,8 @@ const (
 
 // User ..
 type User struct {
-	ID        UserID
-	Name      UserName
+	ID        int64
+	Name      string
 	Email     UserEmail
 	Role      UserRole
 	CreatedAt time.Time
@@ -35,16 +26,16 @@ type User struct {
 
 // UserForCreate ..
 type UserForCreate struct {
-	Name     UserName
+	Name     string
 	Email    UserEmail
-	Password Password
+	Password string
 	Role     UserRole
 }
 
 // UserForUpdate ..
 type UserForUpdate struct {
-	ID    UserID
-	Name  *UserName
+	ID    int64
+	Name  *string
 	Email *UserEmail
 	Role  *UserRole
 }

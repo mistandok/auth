@@ -8,8 +8,8 @@ import (
 
 // UserRepository interface for crud user repositories
 type UserRepository interface {
-	Create(context.Context, *serviceModel.UserForCreate) (serviceModel.UserID, error)
+	Create(context.Context, *serviceModel.UserForCreate) (int64, error)
 	Update(context.Context, *serviceModel.UserForUpdate) error
-	Get(context.Context, serviceModel.UserID) (*serviceModel.User, error)
-	Delete(context.Context, serviceModel.UserID) error
+	Get(context.Context, int64) (*serviceModel.User, error)
+	Delete(context.Context, int64) error
 }
