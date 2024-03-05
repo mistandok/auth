@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"net"
 
 	"github.com/joho/godotenv"
@@ -56,4 +57,12 @@ type PgConfig struct {
 	User     string
 	Password string
 	DbName   string
+}
+
+// DSN ..
+func (cfg *PgConfig) DSN() string {
+	return fmt.Sprintf(
+		"postgres://%s:%s@%s:%d/%s",
+		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DbName,
+	)
 }
