@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/mistandok/platform_common/pkg/db"
 	"time"
+
+	"github.com/mistandok/platform_common/pkg/db"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"

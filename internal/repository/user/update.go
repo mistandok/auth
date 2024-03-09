@@ -3,9 +3,10 @@ package user
 import (
 	"context"
 	"fmt"
-	"github.com/mistandok/platform_common/pkg/db"
 	"strings"
 	"time"
+
+	"github.com/mistandok/platform_common/pkg/db"
 
 	"github.com/jackc/pgx/v5"
 	serviceModel "github.com/mistandok/auth/internal/model"
