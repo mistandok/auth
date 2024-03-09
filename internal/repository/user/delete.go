@@ -3,8 +3,7 @@ package user
 import (
 	"context"
 	"fmt"
-
-	"github.com/mistandok/auth/internal/client/db"
+	"github.com/mistandok/platform_common/pkg/db"
 
 	"github.com/jackc/pgx/v5"
 )
