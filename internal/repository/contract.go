@@ -6,6 +6,8 @@ import (
 	serviceModel "github.com/mistandok/auth/internal/model"
 )
 
+//go:generate ../../bin/mockery --output ./mocks  --inpackage-suffix --all
+
 // UserRepository interface for crud user repositories
 type UserRepository interface {
 	Create(context.Context, *serviceModel.UserForCreate) (int64, error)
