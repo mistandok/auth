@@ -30,6 +30,20 @@ lint:
 fix-imports:
 	GOBIN=$(LOCAL_BIN) $(LOCAL_BIN)/goimports -w .
 
+test:
+	go clean -testcache
+	go test ./... -covermode count -coverpkg=github.com/mistandok/auth/internal/service/...,github.com/mistandok/auth/internal/api/... -count 5
+
+test-coverage:
+	go clean -testcache
+	go test ./... -coverprofile=coverage.tmp.out -covermode count -coverpkg=github.com/mistandok/auth/internal/service/...,github.com/mistandok/auth/internal/api/... -count 5
+	grep -v 'mocks\|config' coverage.tmp.out  > coverage.out
+	rm coverage.tmp.out
+	go tool cover -html=coverage.out;
+	go tool cover -func=./coverage.out | grep "total";
+	grep -sqFx "/coverage.out" .gitignore || echo "/coverage.out" >> .gitignore
+
+
 get-deps:
 	go get -u google.golang.org/protobuf/cmd/protoc-gen-go
 	go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc

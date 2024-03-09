@@ -25,3 +25,4 @@ go.work
 bin/
 
 .env
+/coverage.out
