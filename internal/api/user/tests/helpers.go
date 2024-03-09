@@ -3,6 +3,8 @@ package tests
 import (
 	"time"
 
+	"github.com/mistandok/auth/internal/common"
+
 	"github.com/mistandok/auth/internal/model"
 	"github.com/mistandok/auth/pkg/user_v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -46,5 +48,23 @@ func userFromRepo(userID int64, userDate time.Time) *model.User {
 		Role:      "USER",
 		CreatedAt: userDate,
 		UpdatedAt: userDate,
+	}
+}
+
+func userUpdateRequest(userID int64) *user_v1.UpdateRequest {
+	return &user_v1.UpdateRequest{
+		Id:    userID,
+		Name:  common.Pointer[string]("test"),
+		Email: common.Pointer[string]("test"),
+		Role:  common.Pointer[user_v1.Role](1),
+	}
+}
+
+func userUpdateRepo(userID int64) *model.UserForUpdate {
+	return &model.UserForUpdate{
+		ID:    userID,
+		Name:  common.Pointer[string]("test"),
+		Email: common.Pointer[model.UserEmail]("test"),
+		Role:  common.Pointer[model.UserRole]("USER"),
 	}
 }
