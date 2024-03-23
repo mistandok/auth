@@ -13,7 +13,7 @@ import (
 )
 
 func TestCreate_SuccessUpdateUser(t *testing.T) {
-	ctx := context.TODO()
+	ctx := context.Background()
 	logger := zerolog.Nop()
 
 	var userID int64 = 1
@@ -32,7 +32,7 @@ func TestCreate_SuccessUpdateUser(t *testing.T) {
 }
 
 func TestCreate_FailUpdateUser(t *testing.T) {
-	ctx := context.TODO()
+	ctx := context.Background()
 	logger := zerolog.Nop()
 
 	var userID int64 = 1

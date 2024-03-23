@@ -20,7 +20,7 @@ import (
 )
 
 func TestCreate_SuccessGetUser(t *testing.T) {
-	ctx := context.TODO()
+	ctx := context.Background()
 	logger := zerolog.Nop()
 
 	var userID int64 = 1
@@ -42,7 +42,7 @@ func TestCreate_SuccessGetUser(t *testing.T) {
 }
 
 func TestCreate_FailGetUser(t *testing.T) {
-	ctx := context.TODO()
+	ctx := context.Background()
 	logger := zerolog.Nop()
 
 	var userID int64 = 1

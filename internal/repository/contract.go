@@ -6,7 +6,7 @@ import (
 	serviceModel "github.com/mistandok/auth/internal/model"
 )
 
-//go:generate ../../bin/mockery --output ./mocks  --inpackage-suffix --all
+//go:generate ../../bin/mockery --output ./mocks  --inpackage-suffix --all --case snake
 
 // UserRepository interface for crud user repositories
 type UserRepository interface {

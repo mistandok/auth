@@ -22,7 +22,7 @@ func userForCreate() *model.UserForCreate {
 }
 
 func TestCreate_SuccessCreateUser(t *testing.T) {
-	ctx := context.TODO()
+	ctx := context.Background()
 	logger := zerolog.Nop()
 
 	user := userForCreate()
@@ -41,7 +41,7 @@ func TestCreate_SuccessCreateUser(t *testing.T) {
 }
 
 func TestCreate_FailCreateUser(t *testing.T) {
-	ctx := context.TODO()
+	ctx := context.Background()
 	logger := zerolog.Nop()
 
 	user := userForCreate()

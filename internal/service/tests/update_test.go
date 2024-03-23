@@ -23,7 +23,7 @@ func userForUpdate() *model.UserForUpdate {
 }
 
 func TestUpdate_SuccessUpdateUser(t *testing.T) {
-	ctx := context.TODO()
+	ctx := context.Background()
 	logger := zerolog.Nop()
 
 	user := userForUpdate()
@@ -39,7 +39,7 @@ func TestUpdate_SuccessUpdateUser(t *testing.T) {
 }
 
 func TestUpdate_FailUpdateUser(t *testing.T) {
-	ctx := context.TODO()
+	ctx := context.Background()
 	logger := zerolog.Nop()
 
 	user := userForUpdate()

@@ -25,7 +25,7 @@ func userForGet(userID int64) *model.User {
 }
 
 func TestGet_SuccessGetUser(t *testing.T) {
-	ctx := context.TODO()
+	ctx := context.Background()
 	logger := zerolog.Nop()
 
 	var userIDForGet int64 = 1
@@ -43,7 +43,7 @@ func TestGet_SuccessGetUser(t *testing.T) {
 }
 
 func TestGet_FailGetUser(t *testing.T) {
-	ctx := context.TODO()
+	ctx := context.Background()
 	logger := zerolog.Nop()
 
 	var userIDForGet int64 = 1

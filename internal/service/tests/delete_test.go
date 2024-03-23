@@ -12,7 +12,7 @@ import (
 )
 
 func TestDelete_SuccessDeleteUser(t *testing.T) {
-	ctx := context.TODO()
+	ctx := context.Background()
 	logger := zerolog.Nop()
 
 	var userIDForDelete int64 = 1
@@ -28,7 +28,7 @@ func TestDelete_SuccessDeleteUser(t *testing.T) {
 }
 
 func TestDelete_FailDeleteUser(t *testing.T) {
-	ctx := context.TODO()
+	ctx := context.Background()
 	logger := zerolog.Nop()
 
 	var userIDForDelete int64 = 1

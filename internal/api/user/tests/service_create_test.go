@@ -18,7 +18,7 @@ import (
 )
 
 func TestCreate_SuccessCreateUser(t *testing.T) {
-	ctx := context.TODO()
+	ctx := context.Background()
 	logger := zerolog.Nop()
 
 	var userID int64 = 1
@@ -38,7 +38,7 @@ func TestCreate_SuccessCreateUser(t *testing.T) {
 }
 
 func TestCreate_FailCreateUser(t *testing.T) {
-	ctx := context.TODO()
+	ctx := context.Background()
 	logger := zerolog.Nop()
 
 	request := userCreateRequest()

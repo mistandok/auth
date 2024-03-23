@@ -10,31 +10,39 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+const (
+	userName     string = "test"
+	userEmail           = "test"
+	userPassword        = "test"
+	userRoleInt         = 1
+	userRoleStr         = "USER"
+)
+
 func userCreateRequest() *user_v1.CreateRequest {
 	return &user_v1.CreateRequest{
-		Name:            "test",
-		Email:           "test",
-		Password:        "test",
-		PasswordConfirm: "test",
-		Role:            1,
+		Name:            userName,
+		Email:           userEmail,
+		Password:        userPassword,
+		PasswordConfirm: userPassword,
+		Role:            userRoleInt,
 	}
 }
 
 func userCreateForRepo() *model.UserForCreate {
 	return &model.UserForCreate{
-		Name:     "test",
-		Email:    "test",
-		Password: "test",
-		Role:     "USER",
+		Name:     userName,
+		Email:    userEmail,
+		Password: userPassword,
+		Role:     userRoleStr,
 	}
 }
 
 func userResponseForGet(userID int64, userDate time.Time) *user_v1.GetResponse {
 	return &user_v1.GetResponse{
 		Id:        userID,
-		Name:      "test",
-		Email:     "test",
-		Role:      1,
+		Name:      userName,
+		Email:     userEmail,
+		Role:      userRoleInt,
 		CreatedAt: timestamppb.New(userDate),
 		UpdatedAt: timestamppb.New(userDate),
 	}
@@ -43,9 +51,9 @@ func userResponseForGet(userID int64, userDate time.Time) *user_v1.GetResponse {
 func userFromRepo(userID int64, userDate time.Time) *model.User {
 	return &model.User{
 		ID:        userID,
-		Name:      "test",
-		Email:     "test",
-		Role:      "USER",
+		Name:      userName,
+		Email:     userEmail,
+		Role:      userRoleStr,
 		CreatedAt: userDate,
 		UpdatedAt: userDate,
 	}
@@ -54,17 +62,17 @@ func userFromRepo(userID int64, userDate time.Time) *model.User {
 func userUpdateRequest(userID int64) *user_v1.UpdateRequest {
 	return &user_v1.UpdateRequest{
 		Id:    userID,
-		Name:  common.Pointer[string]("test"),
-		Email: common.Pointer[string]("test"),
-		Role:  common.Pointer[user_v1.Role](1),
+		Name:  common.Pointer[string](userName),
+		Email: common.Pointer[string](userEmail),
+		Role:  common.Pointer[user_v1.Role](userRoleInt),
 	}
 }
 
 func userUpdateRepo(userID int64) *model.UserForUpdate {
 	return &model.UserForUpdate{
 		ID:    userID,
-		Name:  common.Pointer[string]("test"),
-		Email: common.Pointer[model.UserEmail]("test"),
-		Role:  common.Pointer[model.UserRole]("USER"),
+		Name:  common.Pointer[string](userName),
+		Email: common.Pointer[model.UserEmail](userEmail),
+		Role:  common.Pointer[model.UserRole](userRoleStr),
 	}
 }
