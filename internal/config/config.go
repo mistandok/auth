@@ -23,6 +23,16 @@ type PgConfigSearcher interface {
 	Get() (*PgConfig, error)
 }
 
+// HTTPConfigSearcher interface for search Http config.
+type HTTPConfigSearcher interface {
+	Get() (*HTTPConfig, error)
+}
+
+// SwaggerConfigSearcher interface for search Http config.
+type SwaggerConfigSearcher interface {
+	Get() (*SwaggerConfig, error)
+}
+
 // Load dotenv from path to env
 func Load(path string) error {
 	err := godotenv.Load(path)
@@ -65,4 +75,26 @@ func (cfg *PgConfig) DSN() string {
 		"postgres://%s:%s@%s:%d/%s",
 		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DbName,
 	)
+}
+
+// HTTPConfig config for HTTP
+type HTTPConfig struct {
+	Host string
+	Port string
+}
+
+// Address get address from config
+func (cfg *HTTPConfig) Address() string {
+	return net.JoinHostPort(cfg.Host, cfg.Port)
+}
+
+// SwaggerConfig config for Swagger
+type SwaggerConfig struct {
+	Host string
+	Port string
+}
+
+// Address get address from config
+func (cfg *SwaggerConfig) Address() string {
+	return net.JoinHostPort(cfg.Host, cfg.Port)
 }
