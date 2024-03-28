@@ -31,7 +31,7 @@ service UserV1 {
   // Создает нового пользователя
   rpc Create(CreateRequest) returns (CreateResponse){
     option (google.api.http) = {
-      post: "/user/v1/create"
+      post: "/user/v1"
       body: "*"
     };
   }
@@ -46,7 +46,7 @@ service UserV1 {
   // Обновляет пользователя
   rpc Update(UpdateRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      patch: "/user/v1/update"
+      patch: "/user/v1"
       body: "*"
     };
   }

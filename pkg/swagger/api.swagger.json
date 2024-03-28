@@ -88,9 +88,7 @@
         "tags": [
           "UserV1"
         ]
-      }
-    },
-    "/user/v1/create": {
+      },
       "post": {
         "summary": "Создает нового пользователя",
         "operationId": "UserV1_Create",
@@ -121,9 +119,7 @@
         "tags": [
           "UserV1"
         ]
-      }
-    },
-    "/user/v1/update": {
+      },
       "patch": {
         "summary": "Обновляет пользователя",
         "operationId": "UserV1_Update",
