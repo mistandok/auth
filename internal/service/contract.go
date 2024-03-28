@@ -6,6 +6,8 @@ import (
 	"github.com/mistandok/auth/internal/model"
 )
 
+//go:generate ../../bin/mockery --output ./mocks  --inpackage-suffix --all --case snake
+
 // UserService ..
 type UserService interface {
 	Create(context.Context, *model.UserForCreate) (int64, error)

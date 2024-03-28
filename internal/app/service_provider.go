@@ -5,10 +5,11 @@ import (
 	"log"
 	"os"
 
+	"github.com/mistandok/platform_common/pkg/closer"
+	"github.com/mistandok/platform_common/pkg/db"
+	"github.com/mistandok/platform_common/pkg/db/pg"
+
 	"github.com/mistandok/auth/internal/api/user"
-	"github.com/mistandok/auth/internal/client/db"
-	"github.com/mistandok/auth/internal/client/db/pg"
-	"github.com/mistandok/auth/internal/closer"
 	"github.com/mistandok/auth/internal/config"
 	"github.com/mistandok/auth/internal/config/env"
 	"github.com/mistandok/auth/internal/repository"

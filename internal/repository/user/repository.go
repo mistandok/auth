@@ -1,8 +1,8 @@
 package user
 
 import (
-	"github.com/mistandok/auth/internal/client/db"
 	"github.com/mistandok/auth/internal/repository"
+	"github.com/mistandok/platform_common/pkg/db"
 	"github.com/rs/zerolog"
 )
 

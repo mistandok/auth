@@ -5,10 +5,9 @@ import (
 	"log"
 	"net"
 
-	"github.com/mistandok/auth/internal/closer"
 	"github.com/mistandok/auth/internal/config"
 	desc "github.com/mistandok/auth/pkg/user_v1"
-
+	"github.com/mistandok/platform_common/pkg/closer"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
