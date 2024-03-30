@@ -2,16 +2,23 @@ package user
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/mistandok/auth/internal/model"
 )
+
+var ErrPassToLong = errors.New("слишком длинный пароль")
 
 // Create ..
 func (s *Service) Create(ctx context.Context, userForCreate *model.UserForCreate) (int64, error) {
 	hashedPassword, err := s.passManager.HashPassword(userForCreate.Password)
 	if err != nil {
 		s.logger.Err(err).Msg("не удалось хэшировать пароль")
+		if errors.Is(err, bcrypt.ErrPasswordTooLong) {
+			return 0, ErrPassToLong
+		}
 		return 0, err
 	}
 

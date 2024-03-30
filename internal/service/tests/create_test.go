@@ -7,12 +7,10 @@ import (
 	"testing"
 
 	"github.com/mistandok/auth/internal/config"
-	"github.com/mistandok/auth/internal/utils/password"
-	"golang.org/x/crypto/bcrypt"
-
 	"github.com/mistandok/auth/internal/model"
 	"github.com/mistandok/auth/internal/repository/mocks"
 	userService "github.com/mistandok/auth/internal/service/user"
+	"github.com/mistandok/auth/internal/utils/password"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 )
@@ -84,5 +82,5 @@ func TestCreate_FailCreateUserWithTooLongPass(t *testing.T) {
 
 	_, err := service.Create(ctx, user)
 
-	require.ErrorIs(t, err, bcrypt.ErrPasswordTooLong)
+	require.ErrorIs(t, err, userService.ErrPassToLong)
 }

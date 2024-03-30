@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+	"github.com/mistandok/auth/internal/service/user"
 
 	"github.com/mistandok/auth/internal/convert"
 	"github.com/mistandok/auth/internal/repository"
@@ -37,6 +38,8 @@ func (i *Implementation) Create(ctx context.Context, request *user_v1.CreateRequ
 		switch {
 		case errors.Is(err, repository.ErrEmailIsTaken):
 			return nil, status.Error(codes.AlreadyExists, repository.ErrEmailIsTaken.Error())
+		case errors.Is(err, user.ErrPassToLong):
+			return nil, status.Error(codes.InvalidArgument, err.Error())
 		default:
 			return nil, errInternal
 		}
