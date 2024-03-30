@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package auth_v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/mistandok/auth/pkg/auth_v1;auth_v1";
+
+
+service AuthV1 {
+  rpc Login (LoginRequest) returns (LoginResponse);
+  rpc RefreshTokens (RefreshTokensRequest) returns (RefreshTokensResponse);
+}
+
+message LoginRequest {
+  string email = 1 [(validate.rules).string.email = true];
+  string password = 2;
+}
+
+message LoginResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+message RefreshTokensRequest {
+  string refresh_token = 1;
+}
+
+message RefreshTokensResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}

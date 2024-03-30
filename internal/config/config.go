@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"net"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
@@ -31,6 +32,16 @@ type HTTPConfigSearcher interface {
 // SwaggerConfigSearcher interface for search Http config.
 type SwaggerConfigSearcher interface {
 	Get() (*SwaggerConfig, error)
+}
+
+// PasswordConfigSearcher interface for search Password config.
+type PasswordConfigSearcher interface {
+	Get() (*PasswordConfig, error)
+}
+
+// JWTConfigSearcher interface for search JWTConfig
+type JWTConfigSearcher interface {
+	Get() (*JWTConfig, error)
 }
 
 // Load dotenv from path to env
@@ -97,4 +108,16 @@ type SwaggerConfig struct {
 // Address get address from config
 func (cfg *SwaggerConfig) Address() string {
 	return net.JoinHostPort(cfg.Host, cfg.Port)
+}
+
+// PasswordConfig config for password.
+type PasswordConfig struct {
+	PasswordSalt string
+}
+
+// JWTConfig config for JWT.
+type JWTConfig struct {
+	JWTSecretKey                    string
+	JWTAccessTokenExpireThroughMin  time.Duration
+	JWTRefreshTokenExpireThroughMin time.Duration
 }

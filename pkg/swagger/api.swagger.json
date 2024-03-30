@@ -1,22 +1,13 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Auth API",
-    "version": "1.0.0",
-    "contact": {
-      "name": "Anton Artikov",
-      "email": "arti-anton@yandex.ru"
-    }
+    "title": "auth.proto",
+    "version": "version not set"
   },
   "tags": [
     {
-      "name": "UserV1"
+      "name": "AuthV1"
     }
-  ],
-  "host": "localhost:8061",
-  "schemes": [
-    "http",
-    "https"
   ],
   "consumes": [
     "application/json"
@@ -24,137 +15,30 @@
   "produces": [
     "application/json"
   ],
-  "paths": {
-    "/user/v1": {
-      "get": {
-        "summary": "Получает пользователя по ID",
-        "operationId": "UserV1_Get",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/user_v1GetResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "description": "Идентификатор пользователя",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "int64"
-          }
-        ],
-        "tags": [
-          "UserV1"
-        ]
-      },
-      "delete": {
-        "summary": "Удаляет пользователя по ID",
-        "operationId": "UserV1_Delete",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "type": "object",
-              "properties": {}
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "description": "Идентификатор пользователя",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "int64"
-          }
-        ],
-        "tags": [
-          "UserV1"
-        ]
-      },
-      "post": {
-        "summary": "Создает нового пользователя",
-        "operationId": "UserV1_Create",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/user_v1CreateResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/user_v1CreateRequest"
-            }
-          }
-        ],
-        "tags": [
-          "UserV1"
-        ]
-      },
-      "patch": {
-        "summary": "Обновляет пользователя",
-        "operationId": "UserV1_Update",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "type": "object",
-              "properties": {}
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/user_v1UpdateRequest"
-            }
-          }
-        ],
-        "tags": [
-          "UserV1"
-        ]
-      }
-    }
-  },
+  "paths": {},
   "definitions": {
+    "auth_v1LoginResponse": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string"
+        },
+        "refreshToken": {
+          "type": "string"
+        }
+      }
+    },
+    "auth_v1RefreshTokensResponse": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string"
+        },
+        "refreshToken": {
+          "type": "string"
+        }
+      }
+    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -180,104 +64,6 @@
             "type": "object",
             "$ref": "#/definitions/protobufAny"
           }
-        }
-      }
-    },
-    "user_v1CreateRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "title": "Наименование пользователя"
-        },
-        "email": {
-          "type": "string",
-          "title": "email пользователя"
-        },
-        "password": {
-          "type": "string",
-          "title": "Пароль пользователя"
-        },
-        "passwordConfirm": {
-          "type": "string",
-          "title": "Подтверждение пароля пользователя"
-        },
-        "role": {
-          "$ref": "#/definitions/user_v1Role",
-          "title": "Роль пользователя"
-        }
-      }
-    },
-    "user_v1CreateResponse": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "int64",
-          "title": "Идентификатор пользователя"
-        }
-      }
-    },
-    "user_v1GetResponse": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "int64",
-          "title": "Идентификатор пользователя"
-        },
-        "name": {
-          "type": "string",
-          "title": "Наименование пользователя"
-        },
-        "email": {
-          "type": "string",
-          "title": "email пользователя"
-        },
-        "role": {
-          "$ref": "#/definitions/user_v1Role",
-          "title": "Роль пользователя"
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time",
-          "title": "Время создания пользователя"
-        },
-        "updatedAt": {
-          "type": "string",
-          "format": "date-time",
-          "title": "Время обновления пользователя"
-        }
-      }
-    },
-    "user_v1Role": {
-      "type": "string",
-      "enum": [
-        "UNKNOWN",
-        "USER",
-        "ADMIN"
-      ],
-      "default": "UNKNOWN"
-    },
-    "user_v1UpdateRequest": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "int64",
-          "title": "Идентификатор пользователя"
-        },
-        "name": {
-          "type": "string",
-          "title": "Наименование пользователя"
-        },
-        "email": {
-          "type": "string",
-          "title": "email пользователя"
-        },
-        "role": {
-          "$ref": "#/definitions/user_v1Role",
-          "title": "Роль пользователя"
         }
       }
     }
