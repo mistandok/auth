@@ -117,7 +117,7 @@ type PasswordConfig struct {
 
 // JWTConfig config for JWT.
 type JWTConfig struct {
-	JWTSecretKey                    string
-	JWTAccessTokenExpireThroughMin  time.Duration
-	JWTRefreshTokenExpireThroughMin time.Duration
+	JWTSecretKey                 string
+	JWTAccessTokenExpireThrough  time.Duration
+	JWTRefreshTokenExpireThrough time.Duration
 }

@@ -51,8 +51,8 @@ func (s *JWTConfigSearcher) Get() (*config.JWTConfig, error) {
 	}
 
 	return &config.JWTConfig{
-		JWTSecretKey:                    jwtSecret,
-		JWTAccessTokenExpireThroughMin:  time.Duration(accessExpireInt) * time.Minute,
-		JWTRefreshTokenExpireThroughMin: time.Duration(refreshExpireInt) * time.Minute,
+		JWTSecretKey:                 jwtSecret,
+		JWTAccessTokenExpireThrough:  time.Duration(accessExpireInt) * time.Minute,
+		JWTRefreshTokenExpireThrough: time.Duration(refreshExpireInt) * time.Minute,
 	}, nil
 }
