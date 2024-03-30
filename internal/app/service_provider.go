@@ -2,6 +2,8 @@ package app
 
 import (
 	"context"
+	"github.com/mistandok/auth/internal/api/auth"
+	authService "github.com/mistandok/auth/internal/service/auth"
 	"log"
 	"os"
 
@@ -21,11 +23,13 @@ import (
 )
 
 type serviceProvider struct {
-	pgConfig      *config.PgConfig
-	grpcConfig    *config.GRPCConfig
-	httpConfig    *config.HTTPConfig
-	swaggerConfig *config.SwaggerConfig
-	logger        *zerolog.Logger
+	pgConfig       *config.PgConfig
+	grpcConfig     *config.GRPCConfig
+	httpConfig     *config.HTTPConfig
+	swaggerConfig  *config.SwaggerConfig
+	passwordConfig *config.PasswordConfig
+	jwtConfig      *config.JWTConfig
+	logger         *zerolog.Logger
 
 	dbClient  db.Client
 	txManager db.TxManager
@@ -33,8 +37,10 @@ type serviceProvider struct {
 	userRepo repository.UserRepository
 
 	chatService service.UserService
+	authService service.AuthService
 
-	chatImpl *user.Implementation
+	userImpl *user.Implementation
+	authImpl *auth.Implementation
 }
 
 func newServiceProvider() *serviceProvider {
@@ -99,6 +105,36 @@ func (s *serviceProvider) SwaggerConfig() *config.SwaggerConfig {
 	}
 
 	return s.swaggerConfig
+}
+
+// PasswordConfig ..
+func (s *serviceProvider) PasswordConfig() *config.PasswordConfig {
+	if s.passwordConfig == nil {
+		cfgSearcher := env.NewPasswordConfigSearcher()
+		cfg, err := cfgSearcher.Get()
+		if err != nil {
+			log.Fatalf("не удалось получить password config: %s", err.Error())
+		}
+
+		s.passwordConfig = cfg
+	}
+
+	return s.passwordConfig
+}
+
+// JWTConfig ..
+func (s *serviceProvider) JWTConfig() *config.JWTConfig {
+	if s.jwtConfig == nil {
+		cfgSearcher := env.NewJWTConfigSearcher()
+		cfg, err := cfgSearcher.Get()
+		if err != nil {
+			log.Fatalf("не удалось получить jwt config: %s", err.Error())
+		}
+
+		s.jwtConfig = cfg
+	}
+
+	return s.jwtConfig
 }
 
 // Logger ..
@@ -168,11 +204,32 @@ func (s *serviceProvider) UserService(ctx context.Context) service.UserService {
 
 // UserImpl ..
 func (s *serviceProvider) UserImpl(ctx context.Context) *user.Implementation {
-	if s.chatImpl == nil {
-		s.chatImpl = user.NewImplementation(s.UserService(ctx))
+	if s.userImpl == nil {
+		s.userImpl = user.NewImplementation(s.UserService(ctx))
 	}
 
-	return s.chatImpl
+	return s.userImpl
+}
+
+// AuthService ..
+func (s *serviceProvider) AuthService(ctx context.Context) service.AuthService {
+	if s.authService == nil {
+		s.authService = authService.NewService(
+			s.Logger(),
+			s.UserRepository(ctx),
+		)
+	}
+
+	return s.authService
+}
+
+// AuthImpl ..
+func (s *serviceProvider) AuthImpl(ctx context.Context) *auth.Implementation {
+	if s.authImpl == nil {
+		s.authImpl = auth.NewImplementation(s.AuthService(ctx))
+	}
+
+	return s.authImpl
 }
 
 func setupZeroLog(logConfig *config.LogConfig) *zerolog.Logger {

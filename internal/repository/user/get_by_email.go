@@ -14,8 +14,8 @@ import (
 	repoModel "github.com/mistandok/auth/internal/repository/user/model"
 )
 
-// Get user from db.
-func (u *Repo) Get(ctx context.Context, userID int64) (*serviceModel.User, error) {
+// GetByEmail user from db.
+func (u *Repo) GetByEmail(ctx context.Context, email string) (*serviceModel.User, error) {
 	queryFormat := `
 	SELECT 
 	    %s, %s, %s, %s, %s, %s createdAt, %s updatedAt
@@ -29,16 +29,16 @@ func (u *Repo) Get(ctx context.Context, userID int64) (*serviceModel.User, error
 		queryFormat,
 		idColumn, nameColumn, roleColumn, emailColumn, passwordColumn, createdAtColumn, updatedAtColumn,
 		userTable,
-		idColumn, idColumn,
+		emailColumn, emailColumn,
 	)
 
 	q := db.Query{
-		Name:     "user_repository.Get",
+		Name:     "user_repository.GetByEmail",
 		QueryRaw: query,
 	}
 
 	args := pgx.NamedArgs{
-		idColumn: userID,
+		emailColumn: email,
 	}
 
 	rows, err := u.db.DB().QueryContext(ctx, q, args)

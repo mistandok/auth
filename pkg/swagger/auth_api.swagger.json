@@ -1,0 +1,173 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Auth API v1",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Anton Artikov",
+      "email": "arti-anton@yandex.ru"
+    }
+  },
+  "tags": [
+    {
+      "name": "AuthV1"
+    }
+  ],
+  "host": "localhost:8061",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/auth/v1/login": {
+      "post": {
+        "summary": "Login существующего пользователя",
+        "operationId": "AuthV1_Login",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/auth_v1LoginResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/auth_v1LoginRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthV1"
+        ]
+      }
+    },
+    "/auth/v1/refresh-tokens": {
+      "post": {
+        "summary": "Обновление access и refresh токенов по refresh токуне",
+        "operationId": "AuthV1_RefreshTokens",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/auth_v1RefreshTokensResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/auth_v1RefreshTokensRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthV1"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "auth_v1LoginRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "title": "Email пользователя"
+        },
+        "password": {
+          "type": "string",
+          "title": "Пароль пользователя"
+        }
+      }
+    },
+    "auth_v1LoginResponse": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string",
+          "title": "Access token пользователя"
+        },
+        "refreshToken": {
+          "type": "string",
+          "title": "Refresh token пользователя"
+        }
+      }
+    },
+    "auth_v1RefreshTokensRequest": {
+      "type": "object",
+      "properties": {
+        "refreshToken": {
+          "type": "string",
+          "title": "Refresh token пользователя"
+        }
+      }
+    },
+    "auth_v1RefreshTokensResponse": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string",
+          "title": "Access token пользователя"
+        },
+        "refreshToken": {
+          "type": "string",
+          "title": "Refresh token пользователя"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

@@ -22,7 +22,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthV1Client interface {
+	// Login существующего пользователя
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	// Обновление access и refresh токенов по refresh токуне
 	RefreshTokens(ctx context.Context, in *RefreshTokensRequest, opts ...grpc.CallOption) (*RefreshTokensResponse, error)
 }
 
@@ -56,7 +58,9 @@ func (c *authV1Client) RefreshTokens(ctx context.Context, in *RefreshTokensReque
 // All implementations must embed UnimplementedAuthV1Server
 // for forward compatibility
 type AuthV1Server interface {
+	// Login существующего пользователя
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
+	// Обновление access и refresh токенов по refresh токуне
 	RefreshTokens(context.Context, *RefreshTokensRequest) (*RefreshTokensResponse, error)
 	mustEmbedUnimplementedAuthV1Server()
 }

@@ -15,3 +15,7 @@ type UserService interface {
 	Get(context.Context, int64) (*model.User, error)
 	Delete(context.Context, int64) error
 }
+
+// AuthService ..
+type AuthService interface {
+}

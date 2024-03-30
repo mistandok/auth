@@ -14,4 +14,5 @@ type UserRepository interface {
 	Update(context.Context, *serviceModel.UserForUpdate) error
 	Get(context.Context, int64) (*serviceModel.User, error)
 	Delete(context.Context, int64) error
+	GetByEmail(ctx context.Context, email string) (*serviceModel.User, error)
 }

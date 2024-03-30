@@ -20,6 +20,7 @@ type User struct {
 	Name      string
 	Email     UserEmail
 	Role      UserRole
+	Password  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

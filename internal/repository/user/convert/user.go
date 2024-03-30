@@ -41,6 +41,7 @@ func ToServiceUserFromRepoUser(user *repoModel.User) *serviceModel.User {
 		Name:      user.Name,
 		Email:     serviceModel.UserEmail(user.Email),
 		Role:      serviceModel.UserRole(user.Role),
+		Password:  user.Password,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 	}
