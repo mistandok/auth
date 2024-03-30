@@ -2,11 +2,12 @@ package app
 
 import (
 	"context"
+	"log"
+	"os"
+
 	"github.com/mistandok/auth/internal/api/auth"
 	authService "github.com/mistandok/auth/internal/service/auth"
 	"github.com/mistandok/auth/internal/utils/password"
-	"log"
-	"os"
 
 	"github.com/mistandok/platform_common/pkg/closer"
 	"github.com/mistandok/platform_common/pkg/db"

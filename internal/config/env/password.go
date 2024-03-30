@@ -2,8 +2,9 @@ package env
 
 import (
 	"errors"
-	"github.com/mistandok/auth/internal/config"
 	"os"
+
+	"github.com/mistandok/auth/internal/config"
 )
 
 const (

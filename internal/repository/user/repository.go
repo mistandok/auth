@@ -14,6 +14,8 @@ const (
 	roleColumn             = "role"
 	createdAtColumn        = "created_at"
 	updatedAtColumn        = "updated_at"
+	createdAtAliasColumn   = "createdAt"
+	updatedAtAliasColumn   = "updatedAt"
 	userEmailKeyConstraint = "user_email_key"
 	idColumn               = "id"
 )

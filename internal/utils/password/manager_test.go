@@ -1,9 +1,10 @@
 package password
 
 import (
+	"testing"
+
 	"github.com/mistandok/auth/internal/config"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestManager_SuccessPassCompare(t *testing.T) {

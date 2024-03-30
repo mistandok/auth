@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+
 	"github.com/mistandok/auth/internal/service"
 	"github.com/mistandok/auth/pkg/auth_v1"
 )
@@ -24,7 +25,7 @@ func NewImplementation(authService service.AuthService) *Implementation {
 	}
 }
 
-// Create ..
+// Login ..
 func (i *Implementation) Login(ctx context.Context, request *auth_v1.LoginRequest) (*auth_v1.LoginResponse, error) {
 	return &auth_v1.LoginResponse{
 		AccessToken:  "access_token",

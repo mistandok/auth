@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"fmt"
+
 	"github.com/mistandok/auth/internal/model"
 )
 

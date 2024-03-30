@@ -3,9 +3,10 @@ package tests
 import (
 	"context"
 	"errors"
+	"testing"
+
 	"github.com/mistandok/auth/internal/config"
 	"github.com/mistandok/auth/internal/utils/password"
-	"testing"
 
 	userImpl "github.com/mistandok/auth/internal/api/user"
 	"github.com/mistandok/auth/internal/repository/mocks"

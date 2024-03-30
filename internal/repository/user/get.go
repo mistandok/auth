@@ -18,7 +18,7 @@ import (
 func (u *Repo) Get(ctx context.Context, userID int64) (*serviceModel.User, error) {
 	queryFormat := `
 	SELECT 
-	    %s, %s, %s, %s, %s, %s createdAt, %s updatedAt
+	    %s, %s, %s, %s, %s, %s %s, %s %s
 	FROM 
 	    "%s"
 	WHERE
@@ -27,7 +27,7 @@ func (u *Repo) Get(ctx context.Context, userID int64) (*serviceModel.User, error
 
 	query := fmt.Sprintf(
 		queryFormat,
-		idColumn, nameColumn, roleColumn, emailColumn, passwordColumn, createdAtColumn, updatedAtColumn,
+		idColumn, nameColumn, roleColumn, emailColumn, passwordColumn, createdAtColumn, createdAtAliasColumn, updatedAtColumn, updatedAtAliasColumn,
 		userTable,
 		idColumn, idColumn,
 	)

@@ -3,10 +3,11 @@ package tests
 import (
 	"context"
 	"errors"
-	"github.com/mistandok/auth/internal/config"
-	"github.com/mistandok/auth/internal/utils/password"
 	"testing"
 	"time"
+
+	"github.com/mistandok/auth/internal/config"
+	"github.com/mistandok/auth/internal/utils/password"
 
 	"github.com/mistandok/auth/internal/repository"
 	"google.golang.org/grpc/codes"

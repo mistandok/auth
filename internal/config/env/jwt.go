@@ -2,14 +2,15 @@ package env
 
 import (
 	"errors"
-	"github.com/mistandok/auth/internal/config"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/mistandok/auth/internal/config"
 )
 
 const (
-	secretKeyEnvName        = "JWT_SECRET_KEY"
+	jwtKeyEnvName           = "JWT_SECRET_KEY"
 	jwtAccessExpireEnvName  = "JWT_ACCESS_TOKEN_EXPIRES_MIN"
 	jwtRefreshExpireEnvName = "JWT_REFRESH_TOKEN_EXPIRES_MIN"
 )
@@ -24,7 +25,7 @@ func NewJWTConfigSearcher() *JWTConfigSearcher {
 
 // Get config for password.
 func (s *JWTConfigSearcher) Get() (*config.JWTConfig, error) {
-	jwtSecret := os.Getenv(secretKeyEnvName)
+	jwtSecret := os.Getenv(jwtKeyEnvName)
 	if len(jwtSecret) == 0 {
 		return nil, errors.New("не найден секрет для JWT")
 	}
