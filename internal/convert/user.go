@@ -1,8 +1,8 @@
 package convert
 
 import (
-	"github.com/mistandok/auth/internal/common"
 	serviceModel "github.com/mistandok/auth/internal/model"
+	"github.com/mistandok/auth/internal/utils"
 	"github.com/mistandok/auth/pkg/user_v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -26,15 +26,15 @@ func ToServiceUserForUpdateFromUpdateRequest(request *user_v1.UpdateRequest) *se
 	)
 
 	if request.Name != nil {
-		name = common.Pointer[string](*request.Name)
+		name = utils.Pointer[string](*request.Name)
 	}
 
 	if request.Email != nil {
-		email = common.Pointer[serviceModel.UserEmail](serviceModel.UserEmail(*request.Email))
+		email = utils.Pointer[serviceModel.UserEmail](serviceModel.UserEmail(*request.Email))
 	}
 
 	if request.Role != nil {
-		role = common.Pointer[serviceModel.UserRole](ToServiceRoleFromRole(*request.Role))
+		role = utils.Pointer[serviceModel.UserRole](ToServiceRoleFromRole(*request.Role))
 	}
 
 	return &serviceModel.UserForUpdate{

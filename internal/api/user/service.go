@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"errors"
-
 	"github.com/mistandok/auth/internal/convert"
 	"github.com/mistandok/auth/internal/repository"
 	"github.com/mistandok/auth/internal/service"

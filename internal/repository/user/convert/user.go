@@ -1,9 +1,9 @@
 package convert
 
 import (
-	"github.com/mistandok/auth/internal/common"
 	serviceModel "github.com/mistandok/auth/internal/model"
 	repoModel "github.com/mistandok/auth/internal/repository/user/model"
+	"github.com/mistandok/auth/internal/utils"
 )
 
 // ToRepoUserForUpdateFromServiceUserForUpdate ..
@@ -15,15 +15,15 @@ func ToRepoUserForUpdateFromServiceUserForUpdate(user *serviceModel.UserForUpdat
 	)
 
 	if user.Name != nil {
-		name = common.Pointer[string](*user.Name)
+		name = utils.Pointer[string](*user.Name)
 	}
 
 	if user.Email != nil {
-		email = common.Pointer[string](string(*user.Email))
+		email = utils.Pointer[string](string(*user.Email))
 	}
 
 	if user.Role != nil {
-		role = common.Pointer[string](string(*user.Role))
+		role = utils.Pointer[string](string(*user.Role))
 	}
 
 	return &repoModel.UserForUpdate{

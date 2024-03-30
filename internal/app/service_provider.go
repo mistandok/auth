@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/mistandok/auth/internal/api/auth"
 	authService "github.com/mistandok/auth/internal/service/auth"
+	"github.com/mistandok/auth/internal/utils/password"
 	"log"
 	"os"
 
@@ -30,6 +31,7 @@ type serviceProvider struct {
 	passwordConfig *config.PasswordConfig
 	jwtConfig      *config.JWTConfig
 	logger         *zerolog.Logger
+	passManager    *password.Manager
 
 	dbClient  db.Client
 	txManager db.TxManager
@@ -152,6 +154,15 @@ func (s *serviceProvider) Logger() *zerolog.Logger {
 	return s.logger
 }
 
+// PassManager ..
+func (s *serviceProvider) PassManager() *password.Manager {
+	if s.passManager == nil {
+		s.passManager = password.NewManager(s.PasswordConfig())
+	}
+
+	return s.passManager
+}
+
 // DBClient ..
 func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
 	if s.dbClient == nil {
@@ -196,6 +207,7 @@ func (s *serviceProvider) UserService(ctx context.Context) service.UserService {
 		s.chatService = userService.NewService(
 			s.Logger(),
 			s.UserRepository(ctx),
+			s.PassManager(),
 		)
 	}
 

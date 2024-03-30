@@ -3,6 +3,8 @@ package tests
 import (
 	"context"
 	"errors"
+	"github.com/mistandok/auth/internal/config"
+	"github.com/mistandok/auth/internal/utils/password"
 	"testing"
 	"time"
 
@@ -27,6 +29,7 @@ func userForGet(userID int64) *model.User {
 func TestGet_SuccessGetUser(t *testing.T) {
 	ctx := context.Background()
 	logger := zerolog.Nop()
+	passManager := password.NewManager(&config.PasswordConfig{PasswordSalt: "test"})
 
 	var userIDForGet int64 = 1
 	expectedUser := userForGet(userIDForGet)
@@ -34,7 +37,7 @@ func TestGet_SuccessGetUser(t *testing.T) {
 	userRepoMock := mocks.NewUserRepository(t)
 	userRepoMock.On("Get", ctx, userIDForGet).Return(expectedUser, nil).Once()
 
-	service := userService.NewService(&logger, userRepoMock)
+	service := userService.NewService(&logger, userRepoMock, passManager)
 
 	resultUser, err := service.Get(ctx, userIDForGet)
 
@@ -45,6 +48,7 @@ func TestGet_SuccessGetUser(t *testing.T) {
 func TestGet_FailGetUser(t *testing.T) {
 	ctx := context.Background()
 	logger := zerolog.Nop()
+	passManager := password.NewManager(&config.PasswordConfig{PasswordSalt: "test"})
 
 	var userIDForGet int64 = 1
 	repoErr := errors.New("some error")
@@ -52,7 +56,7 @@ func TestGet_FailGetUser(t *testing.T) {
 	userRepoMock := mocks.NewUserRepository(t)
 	userRepoMock.On("Get", ctx, userIDForGet).Return(nil, repoErr).Once()
 
-	service := userService.NewService(&logger, userRepoMock)
+	service := userService.NewService(&logger, userRepoMock, passManager)
 
 	_, err := service.Get(ctx, userIDForGet)
 

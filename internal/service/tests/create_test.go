@@ -3,6 +3,10 @@ package tests
 import (
 	"context"
 	"errors"
+	"github.com/mistandok/auth/internal/config"
+	"github.com/mistandok/auth/internal/utils/password"
+	"golang.org/x/crypto/bcrypt"
+	"strings"
 	"testing"
 
 	"github.com/mistandok/auth/internal/model"
@@ -24,6 +28,7 @@ func userForCreate() *model.UserForCreate {
 func TestCreate_SuccessCreateUser(t *testing.T) {
 	ctx := context.Background()
 	logger := zerolog.Nop()
+	passManager := password.NewManager(&config.PasswordConfig{PasswordSalt: "test"})
 
 	user := userForCreate()
 	var userID int64 = 1
@@ -31,7 +36,7 @@ func TestCreate_SuccessCreateUser(t *testing.T) {
 	userRepoMock := mocks.NewUserRepository(t)
 	userRepoMock.On("Create", ctx, user).Return(userID, nil).Once()
 
-	service := userService.NewService(&logger, userRepoMock)
+	service := userService.NewService(&logger, userRepoMock, passManager)
 
 	resultUserID, err := service.Create(ctx, user)
 
@@ -43,6 +48,7 @@ func TestCreate_SuccessCreateUser(t *testing.T) {
 func TestCreate_FailCreateUser(t *testing.T) {
 	ctx := context.Background()
 	logger := zerolog.Nop()
+	passManager := password.NewManager(&config.PasswordConfig{PasswordSalt: "test"})
 
 	user := userForCreate()
 	repoErr := errors.New("some error")
@@ -50,9 +56,32 @@ func TestCreate_FailCreateUser(t *testing.T) {
 	userRepoMock := mocks.NewUserRepository(t)
 	userRepoMock.On("Create", ctx, user).Return(int64(0), repoErr).Once()
 
-	service := userService.NewService(&logger, userRepoMock)
+	service := userService.NewService(&logger, userRepoMock, passManager)
 
 	_, err := service.Create(ctx, user)
 
 	require.Error(t, err)
+}
+
+func TestCreate_FailCreateUserWithTooLongPass(t *testing.T) {
+	ctx := context.Background()
+	logger := zerolog.Nop()
+	passManager := password.NewManager(
+		&config.PasswordConfig{
+			PasswordSalt: strings.Repeat("very_long_pass", 20),
+		},
+	)
+
+	user := userForCreate()
+
+	var userID int64 = 1
+
+	userRepoMock := mocks.NewUserRepository(t)
+	userRepoMock.On("Create", ctx, user).Return(userID, nil).Maybe()
+
+	service := userService.NewService(&logger, userRepoMock, passManager)
+
+	_, err := service.Create(ctx, user)
+
+	require.ErrorIs(t, err, bcrypt.ErrPasswordTooLong)
 }
