@@ -3,8 +3,9 @@ package white_list
 import (
 	"context"
 	"fmt"
-	"github.com/mistandok/auth/internal/repository"
 	"time"
+
+	"github.com/mistandok/auth/internal/repository"
 
 	"github.com/gomodule/redigo/redis"
 )

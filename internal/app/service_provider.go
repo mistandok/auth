@@ -2,10 +2,12 @@ package app
 
 import (
 	"context"
-	endpointAccessRepository "github.com/mistandok/auth/internal/repository/endpoint_access"
 	"log"
 	"os"
 	"time"
+
+	"github.com/mistandok/auth/internal/api/access"
+	endpointAccessRepository "github.com/mistandok/auth/internal/repository/endpoint_access"
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/mistandok/auth/internal/api/auth"
@@ -52,8 +54,9 @@ type serviceProvider struct {
 	authService service.AuthService
 	jwtService  service.JWTService
 
-	userImpl *user.Implementation
-	authImpl *auth.Implementation
+	userImpl   *user.Implementation
+	authImpl   *auth.Implementation
+	accessImpl *access.Implementation
 }
 
 func newServiceProvider() *serviceProvider {
@@ -325,4 +328,13 @@ func setupZeroLog(logConfig *config.LogConfig) *zerolog.Logger {
 	zerolog.TimeFieldFormat = logConfig.TimeFormat
 
 	return &logger
+}
+
+// AccessImpl ..
+func (s *serviceProvider) AccessImpl(ctx context.Context) *access.Implementation {
+	if s.accessImpl == nil {
+		s.accessImpl = access.NewImplementation()
+	}
+
+	return s.accessImpl
 }

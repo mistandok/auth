@@ -4,14 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	serviceModel "github.com/mistandok/auth/internal/model"
 	"github.com/mistandok/auth/internal/repository"
 	"github.com/mistandok/platform_common/pkg/db"
-	"time"
 )
 
+// Create создать новую настройку доступа для endpoint.
 func (r *Repo) Create(ctx context.Context, endpointAccess *serviceModel.EndpointAccess) (int64, error) {
 	queryFormat := `
 	INSERT INTO "%s" (%s, %s, %s, %s)

@@ -20,6 +20,7 @@ const (
 
 var _ repository.EndpointAccessRepository = (*Repo)(nil)
 
+// Repo ..
 type Repo struct {
 	logger *zerolog.Logger
 	db     db.Client
