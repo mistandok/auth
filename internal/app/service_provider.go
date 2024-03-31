@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	endpointAccessRepository "github.com/mistandok/auth/internal/repository/endpoint_access"
 	"log"
 	"os"
 	"time"
@@ -43,8 +44,9 @@ type serviceProvider struct {
 	txManager     db.TxManager
 	whiteListPool *redis.Pool
 
-	userRepo      repository.UserRepository
-	whiteListRepo repository.WhiteListRepository
+	userRepo           repository.UserRepository
+	whiteListRepo      repository.WhiteListRepository
+	endpointAccessRepo repository.EndpointAccessRepository
 
 	chatService service.UserService
 	authService service.AuthService
@@ -244,6 +246,15 @@ func (s *serviceProvider) UserRepository(ctx context.Context) repository.UserRep
 	}
 
 	return s.userRepo
+}
+
+// EndpointAccessRepository ..
+func (s *serviceProvider) EndpointAccessRepository(ctx context.Context) repository.EndpointAccessRepository {
+	if s.endpointAccessRepo == nil {
+		s.endpointAccessRepo = endpointAccessRepository.NewRepo(s.Logger(), s.DBClient(ctx))
+	}
+
+	return s.endpointAccessRepo
 }
 
 func (s *serviceProvider) WhiteListRepository(ctx context.Context) repository.WhiteListRepository {

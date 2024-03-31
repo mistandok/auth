@@ -3,6 +3,7 @@ package white_list
 import (
 	"context"
 	"fmt"
+	"github.com/mistandok/auth/internal/repository"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
@@ -13,6 +14,8 @@ const (
 	exCommand  = "EX"
 	getCommand = "GET"
 )
+
+var _ repository.WhiteListRepository = (*WhiteListRepo)(nil)
 
 // WhiteListRepo ..
 type WhiteListRepo struct {

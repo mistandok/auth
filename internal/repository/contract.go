@@ -23,3 +23,9 @@ type WhiteListRepository interface {
 	Set(ctx context.Context, userID int64, jwtString string, expireIn time.Duration) error
 	Get(ctx context.Context, userID int64) (string, error)
 }
+
+// EndpointAccessRepository interface для работы с доступами к эндпоинтам
+type EndpointAccessRepository interface {
+	Create(context.Context, *serviceModel.EndpointAccess) (int64, error)
+	GetByAddressAndRole(ctx context.Context, address string, role serviceModel.UserRole) (*serviceModel.EndpointAccess, error)
+}

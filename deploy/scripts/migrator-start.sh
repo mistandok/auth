@@ -16,4 +16,5 @@ wait_database()
 export MIGRATION_DSN="host=${PG_HOST} port=${PG_PORT} dbname=${POSTGRES_DB} user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} sslmode=disable"
 
 wait_database $PG_HOST $PG_PORT
+
 goose -dir "${MIGRATION_DIR}" postgres "${MIGRATION_DSN}" up -v
