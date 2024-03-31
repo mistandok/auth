@@ -14,7 +14,7 @@ const (
 	userName      string          = "test"
 	userEmail     model.UserEmail = "test"
 	userEmailStr  string          = "test"
-	userPassword  string          = "test"
+	userPassword  string          = "password"
 	userRoleStr   string          = "USER"
 	userRole      user_v1.Role    = 1
 	userRoleModel model.UserRole  = "USER"
@@ -27,15 +27,6 @@ func userCreateRequest() *user_v1.CreateRequest {
 		Password:        userPassword,
 		PasswordConfirm: userPassword,
 		Role:            userRole,
-	}
-}
-
-func userCreateForRepo() *model.UserForCreate {
-	return &model.UserForCreate{
-		Name:     userName,
-		Email:    userEmail,
-		Password: userPassword,
-		Role:     userRoleModel,
 	}
 }
 

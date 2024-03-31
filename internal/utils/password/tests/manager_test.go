@@ -1,14 +1,16 @@
-package password
+package tests
 
 import (
 	"testing"
+
+	"github.com/mistandok/auth/internal/utils/password"
 
 	"github.com/mistandok/auth/internal/config"
 	"github.com/stretchr/testify/require"
 )
 
 func TestManager_SuccessPassCompare(t *testing.T) {
-	manager := NewManager(&config.PasswordConfig{PasswordSalt: "test_salt"})
+	manager := password.NewManager(&config.PasswordConfig{PasswordSalt: "test_salt"})
 
 	tests := []struct {
 		name     string
@@ -36,7 +38,7 @@ func TestManager_SuccessPassCompare(t *testing.T) {
 }
 
 func TestManager_FailPassCompare(t *testing.T) {
-	manager := NewManager(&config.PasswordConfig{PasswordSalt: "test_salt"})
+	manager := password.NewManager(&config.PasswordConfig{PasswordSalt: "test_salt"})
 
 	tests := []struct {
 		name         string

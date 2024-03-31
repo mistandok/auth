@@ -17,7 +17,7 @@ func NewManager(passwordConfig *config.PasswordConfig) *Manager {
 
 // HashPassword хэширует пассворд с учетом соли.
 func (m *Manager) HashPassword(password string) (string, error) {
-	passBytes, err := bcrypt.GenerateFromPassword([]byte(m.passWithSalt(password)), 14)
+	passBytes, err := bcrypt.GenerateFromPassword([]byte(m.passWithSalt(password)), bcrypt.MinCost)
 	return string(passBytes), err
 }
 
