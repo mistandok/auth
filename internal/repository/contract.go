@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	serviceModel "github.com/mistandok/auth/internal/model"
 )
@@ -15,4 +16,10 @@ type UserRepository interface {
 	Get(context.Context, int64) (*serviceModel.User, error)
 	Delete(context.Context, int64) error
 	GetByEmail(ctx context.Context, email string) (*serviceModel.User, error)
+}
+
+// WhiteListRepository interface for work with white list for JWT tokens
+type WhiteListRepository interface {
+	Set(ctx context.Context, userID int64, jwtString string, expireIn time.Duration) error
+	Get(ctx context.Context, userID int64) (string, error)
 }

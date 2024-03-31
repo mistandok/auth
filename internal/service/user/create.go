@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/mistandok/auth/internal/model"
 )
 
-var ErrPassToLong = errors.New("слишком длинный пароль")
+var ErrPassToLong = errors.New("слишком длинный пароль") // ErrPassToLong ..
 
 // Create ..
 func (s *Service) Create(ctx context.Context, userForCreate *model.UserForCreate) (int64, error) {

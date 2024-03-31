@@ -18,4 +18,14 @@ type UserService interface {
 
 // AuthService ..
 type AuthService interface {
+	Login(ctx context.Context, userEmail string, userPassword string) (*model.Tokens, error)
+	RefreshTokens(ctx context.Context, refreshTokenStr string) (*model.Tokens, error)
+}
+
+// JWTService ..
+type JWTService interface {
+	GenerateAccessToken(user model.User) (string, error)
+	GenerateRefreshToken(ctx context.Context, user model.User) (string, error)
+	VerifyAccessToken(tokenStr string) (*model.UserClaims, error)
+	VerifyRefreshToken(ctx context.Context, tokenStr string) (*model.UserClaims, error)
 }

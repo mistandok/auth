@@ -44,6 +44,11 @@ type JWTConfigSearcher interface {
 	Get() (*JWTConfig, error)
 }
 
+//// WhiteListRedisConfigSearcher interface for search WhiteListRedisConfigSearcher
+//type WhiteListRedisConfigSearcher interface {
+//	Get() (*WhiteListRedisConfig, error)
+//}
+
 // Load dotenv from path to env
 func Load(path string) error {
 	err := godotenv.Load(path)
@@ -120,4 +125,15 @@ type JWTConfig struct {
 	JWTSecretKey                 string
 	JWTAccessTokenExpireThrough  time.Duration
 	JWTRefreshTokenExpireThrough time.Duration
+}
+
+// WhiteListRedisConfig config for postgresql.
+type WhiteListRedisConfig struct {
+	Host string
+	Port string
+}
+
+// Address get address from config
+func (cfg *WhiteListRedisConfig) Address() string {
+	return net.JoinHostPort(cfg.Host, cfg.Port)
 }

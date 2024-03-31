@@ -14,6 +14,15 @@ services:
       - "${PG_PORT}:${PG_PORT}"
     command: -p ${PG_PORT}
 
+  white_list:
+    image: redis:7.2.4
+    restart: always
+    command: --port ${WHITE_LIST_REDIS_PORT}
+    ports:
+      - "${WHITE_LIST_REDIS_PORT}:${WHITE_LIST_REDIS_PORT}"
+    env_file:
+      - deploy/env/.env.local
+
   migrator:
     build:
       dockerfile: deploy/dockerfiles/migrator.Dockerfile
