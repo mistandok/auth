@@ -27,5 +27,12 @@ type JWTService interface {
 	GenerateAccessToken(user model.User) (string, error)
 	GenerateRefreshToken(ctx context.Context, user model.User) (string, error)
 	VerifyAccessToken(tokenStr string) (*model.UserClaims, error)
+	VerifyAccessTokenFromCtx(ctx context.Context) (*model.UserClaims, error)
 	VerifyRefreshToken(ctx context.Context, tokenStr string) (*model.UserClaims, error)
+}
+
+// AccessService ..
+type AccessService interface {
+	Create(context.Context, *model.EndpointAccess) (int64, error)
+	Check(ctx context.Context, endpointAddress string) error
 }

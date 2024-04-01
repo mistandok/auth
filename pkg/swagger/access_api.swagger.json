@@ -26,8 +26,39 @@
   ],
   "paths": {
     "/access/v1": {
+      "get": {
+        "summary": "Check проверить есть ли доступ к указанному Endpoint",
+        "operationId": "AccessV1_Check",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "address",
+            "description": "Адрес endpoint",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AccessV1"
+        ]
+      },
       "post": {
-        "summary": "Login существующего пользователя",
+        "summary": "Create настройки доступа для Endpoint",
         "operationId": "AccessV1_Create",
         "responses": {
           "200": {

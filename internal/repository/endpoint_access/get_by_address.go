@@ -17,7 +17,7 @@ import (
 func (r *Repo) GetByAddressAndRole(ctx context.Context, address string, role serviceModel.UserRole) (*serviceModel.EndpointAccess, error) {
 	queryFormat := `
 	SELECT 
-	    %s, %s, %s, %s, %s, %s %s
+	    %s, %s, %s, %s %s, %s %s
 	FROM 
 	    %s
 	WHERE

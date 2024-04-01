@@ -3,7 +3,7 @@
 CREATE TABLE IF NOT EXISTS endpoint_access (
     id BIGSERIAL PRIMARY KEY,
     address TEXT NOT NULL,
-    role TEXT NOT NULL,
+    role TEXT NOT NULL CHECK (role <> ''),
     created_at timestamp with time zone default current_timestamp NOT NULL,
     updated_at timestamp with time zone default current_timestamp NOT NULL
 );

@@ -2,9 +2,13 @@ package jwt
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
+
+	"google.golang.org/grpc/metadata"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/mistandok/auth/internal/config"
@@ -58,6 +62,16 @@ func (s *Service) GenerateRefreshToken(ctx context.Context, user model.User) (st
 func (s *Service) VerifyAccessToken(tokenStr string) (*model.UserClaims, error) {
 	s.logger.Debug().Str("access_token", tokenStr).Msg("верификация access token")
 	return s.verifyToken(tokenStr)
+}
+
+// VerifyAccessTokenFromCtx проверка access токена из контекста.
+func (s *Service) VerifyAccessTokenFromCtx(ctx context.Context) (*model.UserClaims, error) {
+	accessToken, err := s.fetchTokenFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.verifyToken(accessToken)
 }
 
 // VerifyRefreshToken проверка refresh токена на валидность.
@@ -128,4 +142,23 @@ func (s *Service) verifyToken(tokenStr string) (*model.UserClaims, error) {
 	}
 
 	return claims, nil
+}
+
+func (s *Service) fetchTokenFromCtx(ctx context.Context) (string, error) {
+	s.logger.Debug().Msg("попытка достать access token из ctx")
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return "", errors.New("метаданные не переданы")
+	}
+
+	authHeader, ok := md["authorization"]
+	if !ok || len(authHeader) == 0 {
+		return "", errors.New("в header не представлена authorization")
+	}
+
+	if !strings.HasPrefix(authHeader[0], "Bearer ") {
+		return "", errors.New("некоректный формат authorization в header")
+	}
+
+	return strings.TrimPrefix(authHeader[0], "Bearer "), nil
 }

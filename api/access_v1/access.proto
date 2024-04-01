@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package auth_v1;
 
-import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 import "validate/validate.proto";
@@ -53,13 +52,20 @@ service AccessV1 {
       body: "*"
     };
   };
+
+  // Check проверить есть ли доступ к указанному Endpoint
+  rpc Check (CheckRequest) returns (google.protobuf.Empty){
+    option (google.api.http) = {
+      get: "/access/v1"
+    };
+  };
 }
 
 message CreateRequest {
   // Адрес endpoint
   string address = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
   // Роль пользователя
-  Role role = 5;
+  Role role = 2;
 }
 
 message CreateResponse {
@@ -67,8 +73,15 @@ message CreateResponse {
   int64 id = 1;
 }
 
+message CheckRequest {
+  // Адрес endpoint
+  string address = 1;
+}
+
 enum Role {
   UNKNOWN = 0;
   USER = 1;
   ADMIN = 2;
 }
+
+

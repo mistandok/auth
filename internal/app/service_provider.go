@@ -6,6 +6,8 @@ import (
 	"os"
 	"time"
 
+	accessService "github.com/mistandok/auth/internal/service/access"
+
 	"github.com/mistandok/auth/internal/api/access"
 	endpointAccessRepository "github.com/mistandok/auth/internal/repository/endpoint_access"
 
@@ -50,9 +52,10 @@ type serviceProvider struct {
 	whiteListRepo      repository.WhiteListRepository
 	endpointAccessRepo repository.EndpointAccessRepository
 
-	chatService service.UserService
-	authService service.AuthService
-	jwtService  service.JWTService
+	chatService   service.UserService
+	authService   service.AuthService
+	jwtService    service.JWTService
+	accessService service.AccessService
 
 	userImpl   *user.Implementation
 	authImpl   *auth.Implementation
@@ -312,6 +315,15 @@ func (s *serviceProvider) AuthService(ctx context.Context) service.AuthService {
 	return s.authService
 }
 
+// AccessService ..
+func (s *serviceProvider) AccessService(ctx context.Context) service.AccessService {
+	if s.accessService == nil {
+		s.accessService = accessService.NewService(s.Logger(), s.EndpointAccessRepository(ctx), s.JWTService(ctx))
+	}
+
+	return s.accessService
+}
+
 // AuthImpl ..
 func (s *serviceProvider) AuthImpl(ctx context.Context) *auth.Implementation {
 	if s.authImpl == nil {
@@ -333,7 +345,7 @@ func setupZeroLog(logConfig *config.LogConfig) *zerolog.Logger {
 // AccessImpl ..
 func (s *serviceProvider) AccessImpl(ctx context.Context) *access.Implementation {
 	if s.accessImpl == nil {
-		s.accessImpl = access.NewImplementation()
+		s.accessImpl = access.NewImplementation(s.AccessService(ctx))
 	}
 
 	return s.accessImpl

@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"google.golang.org/grpc/metadata"
+
 	"github.com/mistandok/auth/internal/repository/mocks"
 	autService "github.com/mistandok/auth/internal/service"
 	"github.com/rs/zerolog"
@@ -203,6 +205,29 @@ func TestService_ErrorWhenAccessTokenWithWrongSign(t *testing.T) {
 
 	_, err = service.VerifyAccessToken(accessTokenWithAnotherSign)
 	require.Error(t, err)
+}
+
+func TestService_VerifyAccessTokenFromCtxSuccess(t *testing.T) {
+	ctx := context.Background()
+
+	logger := zerolog.Nop()
+	jwtConfig := &config.JWTConfig{
+		JWTSecretKey:                 "secret",
+		JWTAccessTokenExpireThrough:  1 * time.Minute,
+		JWTRefreshTokenExpireThrough: 60 * time.Minute,
+	}
+	whiteListRepo := mocks.NewWhiteListRepository(t)
+
+	service := jwt.NewService(&logger, jwtConfig, whiteListRepo)
+	user := *testUser()
+	accessToken, err := service.GenerateAccessToken(user)
+	require.NoError(t, err)
+
+	md := metadata.New(map[string]string{"Authorization": "Bearer " + accessToken})
+	ctx = metadata.NewIncomingContext(ctx, md)
+
+	_, err = service.VerifyAccessTokenFromCtx(ctx)
+	require.NoError(t, err)
 }
 
 func testUser() *model.User {
