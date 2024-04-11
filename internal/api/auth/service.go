@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"github.com/mistandok/auth/internal/api"
 
 	"github.com/mistandok/auth/internal/repository"
 	"github.com/mistandok/auth/internal/service"
@@ -10,10 +11,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
-
-const msgInternalError = "что-то пошло не так, мы уже работаем над решением проблемы"
-
-var errInternal = errors.New(msgInternalError)
 
 // Implementation user Server.
 type Implementation struct {
@@ -38,7 +35,7 @@ func (i *Implementation) Login(ctx context.Context, request *auth_v1.LoginReques
 		case errors.Is(err, service.ErrIncorrectPassword):
 			return nil, status.Error(codes.InvalidArgument, service.ErrIncorrectPassword.Error())
 		default:
-			return nil, errInternal
+			return nil, api.ErrInternal
 		}
 	}
 

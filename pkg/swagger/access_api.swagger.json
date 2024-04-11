@@ -99,7 +99,7 @@
           "title": "Адрес endpoint"
         },
         "role": {
-          "$ref": "#/definitions/auth_v1Role",
+          "$ref": "#/definitions/user_v1Role",
           "title": "Роль пользователя"
         }
       }
@@ -113,15 +113,6 @@
           "title": "Идентификатор настройки доступа для endpoint"
         }
       }
-    },
-    "auth_v1Role": {
-      "type": "string",
-      "enum": [
-        "UNKNOWN",
-        "USER",
-        "ADMIN"
-      ],
-      "default": "UNKNOWN"
     },
     "protobufAny": {
       "type": "object",
@@ -150,6 +141,15 @@
           }
         }
       }
+    },
+    "user_v1Role": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "USER",
+        "ADMIN"
+      ],
+      "default": "UNKNOWN"
     }
   },
   "securityDefinitions": {

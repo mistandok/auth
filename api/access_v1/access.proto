@@ -6,6 +6,7 @@ import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 import "validate/validate.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "user.proto";
 
 option go_package = "github.com/mistandok/auth/pkg/access_v1;access_v1";
 
@@ -65,7 +66,7 @@ message CreateRequest {
   // Адрес endpoint
   string address = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
   // Роль пользователя
-  Role role = 2;
+  user_v1.Role role = 2;
 }
 
 message CreateResponse {
@@ -76,12 +77,6 @@ message CreateResponse {
 message CheckRequest {
   // Адрес endpoint
   string address = 1;
-}
-
-enum Role {
-  UNKNOWN = 0;
-  USER = 1;
-  ADMIN = 2;
 }
 
 

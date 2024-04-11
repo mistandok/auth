@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+	"github.com/mistandok/auth/internal/api"
 
 	"github.com/mistandok/auth/internal/service/user"
 
@@ -14,10 +15,6 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
-
-const msgInternalError = "что-то пошло не так, мы уже работаем над решением проблемы"
-
-var errInternal = errors.New(msgInternalError)
 
 // Implementation user Server.
 type Implementation struct {
@@ -42,7 +39,7 @@ func (i *Implementation) Create(ctx context.Context, request *user_v1.CreateRequ
 		case errors.Is(err, user.ErrPassToLong):
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		default:
-			return nil, errInternal
+			return nil, api.ErrInternal
 		}
 	}
 
@@ -57,7 +54,7 @@ func (i *Implementation) Get(ctx context.Context, request *user_v1.GetRequest) (
 		case errors.Is(err, repository.ErrUserNotFound):
 			return nil, status.Error(codes.NotFound, repository.ErrUserNotFound.Error())
 		default:
-			return nil, errInternal
+			return nil, api.ErrInternal
 		}
 	}
 
@@ -68,7 +65,7 @@ func (i *Implementation) Get(ctx context.Context, request *user_v1.GetRequest) (
 func (i *Implementation) Update(ctx context.Context, request *user_v1.UpdateRequest) (*emptypb.Empty, error) {
 	err := i.userService.Update(ctx, convert.ToServiceUserForUpdateFromUpdateRequest(request))
 	if err != nil {
-		return nil, errInternal
+		return nil, api.ErrInternal
 	}
 
 	return &emptypb.Empty{}, nil
@@ -78,7 +75,7 @@ func (i *Implementation) Update(ctx context.Context, request *user_v1.UpdateRequ
 func (i *Implementation) Delete(ctx context.Context, request *user_v1.DeleteRequest) (*emptypb.Empty, error) {
 	err := i.userService.Delete(ctx, request.Id)
 	if err != nil {
-		return nil, errInternal
+		return nil, api.ErrInternal
 	}
 
 	return &emptypb.Empty{}, nil

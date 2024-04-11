@@ -3,6 +3,7 @@ package access
 import (
 	"context"
 	"errors"
+	"github.com/mistandok/auth/internal/api"
 
 	"github.com/mistandok/auth/internal/convert"
 	"github.com/mistandok/auth/internal/service"
@@ -11,10 +12,6 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
-
-const msgInternalError = "что-то пошло не так, мы уже работаем над решением проблемы"
-
-var errInternal = errors.New(msgInternalError)
 
 // Implementation user Server.
 type Implementation struct {
@@ -35,7 +32,7 @@ func (i *Implementation) Create(ctx context.Context, request *access_v1.CreateRe
 		case errors.Is(err, service.ErrNeedAdminRole):
 			return nil, status.Error(codes.PermissionDenied, err.Error())
 		default:
-			return nil, errInternal
+			return nil, api.ErrInternal
 		}
 	}
 
