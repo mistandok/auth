@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+
 	"github.com/mistandok/auth/internal/utils"
 
 	"github.com/mistandok/auth/internal/model"

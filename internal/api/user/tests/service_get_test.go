@@ -3,10 +3,11 @@ package tests
 import (
 	"context"
 	"errors"
-	"github.com/mistandok/auth/internal/model"
-	"github.com/mistandok/auth/internal/utils"
 	"testing"
 	"time"
+
+	"github.com/mistandok/auth/internal/model"
+	"github.com/mistandok/auth/internal/utils"
 
 	"github.com/mistandok/auth/internal/config"
 	"github.com/mistandok/auth/internal/utils/password"

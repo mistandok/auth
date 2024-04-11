@@ -3,8 +3,9 @@ package auth
 import (
 	"context"
 	"fmt"
-	"github.com/mistandok/auth/internal/utils"
 	"strconv"
+
+	"github.com/mistandok/auth/internal/utils"
 
 	"github.com/mistandok/auth/internal/model"
 	"github.com/mistandok/auth/internal/repository"

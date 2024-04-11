@@ -9,7 +9,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1
 	github.com/jackc/pgx/v5 v5.5.4
 	github.com/joho/godotenv v1.5.1
-	github.com/mistandok/platform_common v0.0.0-20240309141914-72e566afd0a7
+	github.com/mistandok/platform_common v0.0.4
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.10.1
 	github.com/rs/zerolog v1.32.0

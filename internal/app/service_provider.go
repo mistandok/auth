@@ -2,8 +2,6 @@ package app
 
 import (
 	"context"
-	"github.com/mistandok/auth/internal/temp_redis"
-	"github.com/mistandok/auth/internal/temp_redis/rs"
 	"log"
 	"os"
 	"time"
@@ -22,6 +20,8 @@ import (
 	"github.com/mistandok/platform_common/pkg/closer"
 	"github.com/mistandok/platform_common/pkg/db"
 	"github.com/mistandok/platform_common/pkg/db/pg"
+	"github.com/mistandok/platform_common/pkg/memory_db"
+	"github.com/mistandok/platform_common/pkg/memory_db/rs"
 
 	"github.com/mistandok/auth/internal/api/user"
 	"github.com/mistandok/auth/internal/config"
@@ -48,7 +48,7 @@ type serviceProvider struct {
 
 	dbClient      db.Client
 	txManager     db.TxManager
-	redisDbClient temp_redis.Client
+	redisDbClient memory_db.Client
 
 	userRepo           repository.UserRepository
 	whiteListRepo      repository.WhiteListRepository
@@ -226,7 +226,7 @@ func (s *serviceProvider) TxManager(ctx context.Context) db.TxManager {
 	return s.txManager
 }
 
-func (s *serviceProvider) RedisDBClient(_ context.Context) temp_redis.Client {
+func (s *serviceProvider) RedisDBClient(_ context.Context) memory_db.Client {
 	if s.redisDbClient == nil {
 		redisConfig := s.RedisConfig()
 		redisPool := &redis.Pool{

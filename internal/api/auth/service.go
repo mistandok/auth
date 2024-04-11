@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+
 	"github.com/mistandok/auth/internal/api"
 
 	"github.com/mistandok/auth/internal/repository"

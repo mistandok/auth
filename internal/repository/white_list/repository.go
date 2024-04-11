@@ -3,8 +3,9 @@ package white_list
 import (
 	"context"
 	"fmt"
-	"github.com/mistandok/auth/internal/temp_redis"
 	"time"
+
+	"github.com/mistandok/platform_common/pkg/memory_db"
 
 	"github.com/mistandok/auth/internal/repository"
 )
@@ -19,11 +20,11 @@ var _ repository.WhiteListRepository = (*WhiteListRepo)(nil)
 
 // WhiteListRepo ..
 type WhiteListRepo struct {
-	client temp_redis.Client
+	client memory_db.Client
 }
 
 // NewWhiteListRepo ..
-func NewWhiteListRepo(client temp_redis.Client) *WhiteListRepo {
+func NewWhiteListRepo(client memory_db.Client) *WhiteListRepo {
 	return &WhiteListRepo{
 		client: client,
 	}
@@ -31,8 +32,7 @@ func NewWhiteListRepo(client temp_redis.Client) *WhiteListRepo {
 
 // Set записать токен в белый список
 func (r *WhiteListRepo) Set(ctx context.Context, userID int64, jwtString string, expireIn time.Duration) error {
-	db := r.client.DB()
-	_, err := db.String(db.DoContext(ctx, setCommand, userID, jwtString, exCommand, expireIn.Seconds()))
+	_, err := r.client.DB().DoContext(ctx, setCommand, userID, jwtString, exCommand, expireIn.Seconds())
 	if err != nil {
 		return fmt.Errorf("ошибка при попытке сохранить запись в WhiteListRepo: %w", err)
 	}
