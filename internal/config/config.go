@@ -46,7 +46,7 @@ type JWTConfigSearcher interface {
 
 //// WhiteListRedisConfigSearcher interface for search WhiteListRedisConfigSearcher
 //type WhiteListRedisConfigSearcher interface {
-//	Get() (*WhiteListRedisConfig, error)
+//	Get() (*RedisConfig, error)
 //}
 
 // Load dotenv from path to env
@@ -127,13 +127,13 @@ type JWTConfig struct {
 	JWTRefreshTokenExpireThrough time.Duration
 }
 
-// WhiteListRedisConfig config for postgresql.
-type WhiteListRedisConfig struct {
+// RedisConfig config for postgresql.
+type RedisConfig struct {
 	Host string
 	Port string
 }
 
 // Address get address from config
-func (cfg *WhiteListRedisConfig) Address() string {
+func (cfg *RedisConfig) Address() string {
 	return net.JoinHostPort(cfg.Host, cfg.Port)
 }

@@ -34,15 +34,15 @@ import (
 )
 
 type serviceProvider struct {
-	pgConfig        *config.PgConfig
-	grpcConfig      *config.GRPCConfig
-	httpConfig      *config.HTTPConfig
-	swaggerConfig   *config.SwaggerConfig
-	passwordConfig  *config.PasswordConfig
-	jwtConfig       *config.JWTConfig
-	whiteListConfig *config.WhiteListRedisConfig
-	logger          *zerolog.Logger
-	passManager     *password.Manager
+	pgConfig       *config.PgConfig
+	grpcConfig     *config.GRPCConfig
+	httpConfig     *config.HTTPConfig
+	swaggerConfig  *config.SwaggerConfig
+	passwordConfig *config.PasswordConfig
+	jwtConfig      *config.JWTConfig
+	redisConfig    *config.RedisConfig
+	logger         *zerolog.Logger
+	passManager    *password.Manager
 
 	dbClient      db.Client
 	txManager     db.TxManager
@@ -156,19 +156,19 @@ func (s *serviceProvider) JWTConfig() *config.JWTConfig {
 	return s.jwtConfig
 }
 
-// WhiteListConfig ..
-func (s *serviceProvider) WhiteListConfig() *config.WhiteListRedisConfig {
-	if s.whiteListConfig == nil {
-		cfgSearcher := env.NewWhiteListRedisCfgSearcher()
+// RedisConfig ..
+func (s *serviceProvider) RedisConfig() *config.RedisConfig {
+	if s.redisConfig == nil {
+		cfgSearcher := env.NewRedisCfgSearcher()
 		cfg, err := cfgSearcher.Get()
 		if err != nil {
 			log.Fatalf("не удалось получить white list redis config: %s", err.Error())
 		}
 
-		s.whiteListConfig = cfg
+		s.redisConfig = cfg
 	}
 
-	return s.whiteListConfig
+	return s.redisConfig
 }
 
 // Logger ..
@@ -224,13 +224,13 @@ func (s *serviceProvider) TxManager(ctx context.Context) db.TxManager {
 	return s.txManager
 }
 
-func (s *serviceProvider) WhiteListPool(_ context.Context) *redis.Pool {
+func (s *serviceProvider) RedisPool(_ context.Context) *redis.Pool {
 	if s.whiteListPool == nil {
 		s.whiteListPool = &redis.Pool{
 			MaxIdle:     5,
 			IdleTimeout: 60 * time.Second,
 			DialContext: func(ctx context.Context) (redis.Conn, error) {
-				return redis.DialContext(ctx, "tcp", s.WhiteListConfig().Address())
+				return redis.DialContext(ctx, "tcp", s.RedisConfig().Address())
 			},
 			TestOnBorrowContext: func(ctx context.Context, conn redis.Conn, lastUsed time.Time) error {
 				if time.Since(lastUsed) < time.Minute {
@@ -265,7 +265,7 @@ func (s *serviceProvider) EndpointAccessRepository(ctx context.Context) reposito
 
 func (s *serviceProvider) WhiteListRepository(ctx context.Context) repository.WhiteListRepository {
 	if s.whiteListRepo == nil {
-		s.whiteListRepo = whiteList.NewWhiteListRepo(s.WhiteListPool(ctx))
+		s.whiteListRepo = whiteList.NewWhiteListRepo(s.RedisPool(ctx))
 	}
 
 	return s.whiteListRepo

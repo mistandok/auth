@@ -25,14 +25,14 @@ services:
     environment:
       PG_HOST: storage
 
-  white_list:
+  redis:
     image: redis:7.2.4
     restart: always
     env_file:
       - deploy/env/.env.prod
     expose:
-      - ${WHITE_LIST_REDIS_PORT}
-    command: --port ${WHITE_LIST_REDIS_PORT}
+      - ${REDIS_PORT}
+    command: --port ${REDIS_PORT}
 
   auth_service:
     build:
