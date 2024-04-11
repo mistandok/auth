@@ -39,3 +39,7 @@ func (r *rs) DoContext(ctx context.Context, commandName string, args ...interfac
 func (r *rs) Close() error {
 	return r.pool.Close()
 }
+
+func (r *rs) String(reply interface{}, err error) (string, error) {
+	return redis.String(reply, err)
+}

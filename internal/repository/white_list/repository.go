@@ -7,8 +7,6 @@ import (
 	"time"
 
 	"github.com/mistandok/auth/internal/repository"
-
-	"github.com/gomodule/redigo/redis"
 )
 
 const (
@@ -33,7 +31,8 @@ func NewWhiteListRepo(client temp_redis.Client) *WhiteListRepo {
 
 // Set записать токен в белый список
 func (r *WhiteListRepo) Set(ctx context.Context, userID int64, jwtString string, expireIn time.Duration) error {
-	_, err := redis.String(r.client.DB().DoContext(ctx, setCommand, userID, jwtString, exCommand, expireIn.Seconds()))
+	db := r.client.DB()
+	_, err := db.String(db.DoContext(ctx, setCommand, userID, jwtString, exCommand, expireIn.Seconds()))
 	if err != nil {
 		return fmt.Errorf("ошибка при попытке сохранить запись в WhiteListRepo: %w", err)
 	}
@@ -43,7 +42,8 @@ func (r *WhiteListRepo) Set(ctx context.Context, userID int64, jwtString string,
 
 // Get получить токен из белого списка.
 func (r *WhiteListRepo) Get(ctx context.Context, userID int64) (string, error) {
-	reply, err := redis.String(r.client.DB().DoContext(ctx, getCommand, userID))
+	db := r.client.DB()
+	reply, err := db.String(db.DoContext(ctx, getCommand, userID))
 	if err != nil {
 		return "", fmt.Errorf("ошибка при попытке поулчить запись из WhiteListRepo: %w", err)
 	}
