@@ -3,6 +3,7 @@ package white_list
 import (
 	"context"
 	"fmt"
+	"github.com/mistandok/auth/internal/temp_redis"
 	"time"
 
 	"github.com/mistandok/auth/internal/repository"
@@ -20,27 +21,19 @@ var _ repository.WhiteListRepository = (*WhiteListRepo)(nil)
 
 // WhiteListRepo ..
 type WhiteListRepo struct {
-	pool *redis.Pool
+	client temp_redis.Client
 }
 
 // NewWhiteListRepo ..
-func NewWhiteListRepo(pool *redis.Pool) *WhiteListRepo {
+func NewWhiteListRepo(client temp_redis.Client) *WhiteListRepo {
 	return &WhiteListRepo{
-		pool: pool,
+		client: client,
 	}
 }
 
 // Set записать токен в белый список
 func (r *WhiteListRepo) Set(ctx context.Context, userID int64, jwtString string, expireIn time.Duration) error {
-	conn, err := r.pool.GetContext(ctx)
-	if err != nil {
-		return fmt.Errorf("ошибка при получении соединения к WhiteListRepo из пула соединений: %w", err)
-	}
-	defer func() {
-		_ = conn.Close()
-	}()
-
-	_, err = redis.String(conn.Do(setCommand, userID, jwtString, exCommand, expireIn.Seconds()))
+	_, err := redis.String(r.client.DB().DoContext(ctx, setCommand, userID, jwtString, exCommand, expireIn.Seconds()))
 	if err != nil {
 		return fmt.Errorf("ошибка при попытке сохранить запись в WhiteListRepo: %w", err)
 	}
@@ -50,15 +43,7 @@ func (r *WhiteListRepo) Set(ctx context.Context, userID int64, jwtString string,
 
 // Get получить токен из белого списка.
 func (r *WhiteListRepo) Get(ctx context.Context, userID int64) (string, error) {
-	conn, err := r.pool.GetContext(ctx)
-	if err != nil {
-		return "", fmt.Errorf("ошибка при получении соединения к WhiteListRepo из пула соединений: %w", err)
-	}
-	defer func() {
-		_ = conn.Close()
-	}()
-
-	reply, err := redis.String(conn.Do(getCommand, userID))
+	reply, err := redis.String(r.client.DB().DoContext(ctx, getCommand, userID))
 	if err != nil {
 		return "", fmt.Errorf("ошибка при попытке поулчить запись из WhiteListRepo: %w", err)
 	}

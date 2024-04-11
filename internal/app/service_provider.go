@@ -2,6 +2,8 @@ package app
 
 import (
 	"context"
+	"github.com/mistandok/auth/internal/temp_redis"
+	"github.com/mistandok/auth/internal/temp_redis/rs"
 	"log"
 	"os"
 	"time"
@@ -46,7 +48,7 @@ type serviceProvider struct {
 
 	dbClient      db.Client
 	txManager     db.TxManager
-	whiteListPool *redis.Pool
+	redisDbClient temp_redis.Client
 
 	userRepo           repository.UserRepository
 	whiteListRepo      repository.WhiteListRepository
@@ -224,10 +226,10 @@ func (s *serviceProvider) TxManager(ctx context.Context) db.TxManager {
 	return s.txManager
 }
 
-func (s *serviceProvider) RedisPool(_ context.Context) *redis.Pool {
-	if s.whiteListPool == nil {
+func (s *serviceProvider) RedisDBClient(_ context.Context) temp_redis.Client {
+	if s.redisDbClient == nil {
 		redisConfig := s.RedisConfig()
-		s.whiteListPool = &redis.Pool{
+		redisPool := &redis.Pool{
 			MaxIdle:     redisConfig.MaxIdle,
 			IdleTimeout: redisConfig.IdleTimeout,
 			DialContext: func(ctx context.Context) (redis.Conn, error) {
@@ -241,9 +243,12 @@ func (s *serviceProvider) RedisPool(_ context.Context) *redis.Pool {
 				return err
 			},
 		}
+		s.redisDbClient = rs.New(redisPool)
+
+		closer.Add(s.redisDbClient.Close)
 	}
 
-	return s.whiteListPool
+	return s.redisDbClient
 }
 
 // UserRepository ..
@@ -266,7 +271,7 @@ func (s *serviceProvider) EndpointAccessRepository(ctx context.Context) reposito
 
 func (s *serviceProvider) WhiteListRepository(ctx context.Context) repository.WhiteListRepository {
 	if s.whiteListRepo == nil {
-		s.whiteListRepo = whiteList.NewWhiteListRepo(s.RedisPool(ctx))
+		s.whiteListRepo = whiteList.NewWhiteListRepo(s.RedisDBClient(ctx))
 	}
 
 	return s.whiteListRepo
