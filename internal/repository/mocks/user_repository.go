@@ -60,59 +60,29 @@ func (_m *UserRepository) Delete(_a0 context.Context, _a1 int64) error {
 	return r0
 }
 
-// Get provides a mock function with given fields: _a0, _a1
-func (_m *UserRepository) Get(_a0 context.Context, _a1 int64) (*model.User, error) {
-	ret := _m.Called(_a0, _a1)
+// GetByFilter provides a mock function with given fields: ctx, filter
+func (_m *UserRepository) GetByFilter(ctx context.Context, filter *model.UserFilter) (*model.User, error) {
+	ret := _m.Called(ctx, filter)
 
 	if len(ret) == 0 {
-		panic("no return value specified for Get")
+		panic("no return value specified for GetByFilter")
 	}
 
 	var r0 *model.User
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, int64) (*model.User, error)); ok {
-		return rf(_a0, _a1)
+	if rf, ok := ret.Get(0).(func(context.Context, *model.UserFilter) (*model.User, error)); ok {
+		return rf(ctx, filter)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, int64) *model.User); ok {
-		r0 = rf(_a0, _a1)
+	if rf, ok := ret.Get(0).(func(context.Context, *model.UserFilter) *model.User); ok {
+		r0 = rf(ctx, filter)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.User)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
-		r1 = rf(_a0, _a1)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// GetByEmail provides a mock function with given fields: ctx, email
-func (_m *UserRepository) GetByEmail(ctx context.Context, email string) (*model.User, error) {
-	ret := _m.Called(ctx, email)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetByEmail")
-	}
-
-	var r0 *model.User
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (*model.User, error)); ok {
-		return rf(ctx, email)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) *model.User); ok {
-		r0 = rf(ctx, email)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*model.User)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, email)
+	if rf, ok := ret.Get(1).(func(context.Context, *model.UserFilter) error); ok {
+		r1 = rf(ctx, filter)
 	} else {
 		r1 = ret.Error(1)
 	}

@@ -44,11 +44,6 @@ type JWTConfigSearcher interface {
 	Get() (*JWTConfig, error)
 }
 
-//// WhiteListRedisConfigSearcher interface for search WhiteListRedisConfigSearcher
-//type WhiteListRedisConfigSearcher interface {
-//	Get() (*RedisConfig, error)
-//}
-
 // Load dotenv from path to env
 func Load(path string) error {
 	err := godotenv.Load(path)

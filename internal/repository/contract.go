@@ -13,9 +13,8 @@ import (
 type UserRepository interface {
 	Create(context.Context, *serviceModel.UserForCreate) (int64, error)
 	Update(context.Context, *serviceModel.UserForUpdate) error
-	Get(context.Context, int64) (*serviceModel.User, error)
 	Delete(context.Context, int64) error
-	GetByEmail(ctx context.Context, email string) (*serviceModel.User, error)
+	GetByFilter(ctx context.Context, filter *serviceModel.UserFilter) (*serviceModel.User, error)
 }
 
 // WhiteListRepository interface for work with white list for JWT tokens

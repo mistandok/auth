@@ -4,21 +4,34 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
-	"github.com/mistandok/platform_common/pkg/db"
-
 	"github.com/jackc/pgx/v5"
 	serviceModel "github.com/mistandok/auth/internal/model"
 	"github.com/mistandok/auth/internal/repository"
 	"github.com/mistandok/auth/internal/repository/user/convert"
 	repoModel "github.com/mistandok/auth/internal/repository/user/model"
+	"github.com/mistandok/platform_common/pkg/db"
 )
 
-// GetByEmail user from db.
-func (u *Repo) GetByEmail(ctx context.Context, email string) (*serviceModel.User, error) {
+// GetByFilter user from db.
+func (u *Repo) GetByFilter(ctx context.Context, filter *serviceModel.UserFilter) (*serviceModel.User, error) {
+	args := pgx.NamedArgs{}
+	whereColumn := ""
+
+	if filter.ID != nil {
+		args[idColumn] = *filter.ID
+		whereColumn = idColumn
+	} else if filter.Email != nil {
+		args[emailColumn] = *filter.Email
+		whereColumn = emailColumn
+	}
+
+	if len(args) == 0 {
+		return nil, repository.ErrIncorrectFilters
+	}
+
 	queryFormat := `
 	SELECT 
-	    %s, %s, %s, %s, %s, %s createdAt, %s updatedAt
+	    %s, %s, %s, %s, %s, %s %s, %s %s
 	FROM 
 	    "%s"
 	WHERE
@@ -27,18 +40,14 @@ func (u *Repo) GetByEmail(ctx context.Context, email string) (*serviceModel.User
 
 	query := fmt.Sprintf(
 		queryFormat,
-		idColumn, nameColumn, roleColumn, emailColumn, passwordColumn, createdAtColumn, updatedAtColumn,
+		idColumn, nameColumn, roleColumn, emailColumn, passwordColumn, createdAtColumn, createdAtAliasColumn, updatedAtColumn, updatedAtAliasColumn,
 		userTable,
-		emailColumn, emailColumn,
+		whereColumn, whereColumn,
 	)
 
 	q := db.Query{
-		Name:     "user_repository.GetByEmail",
+		Name:     "user_repository.GetByFilter",
 		QueryRaw: query,
-	}
-
-	args := pgx.NamedArgs{
-		emailColumn: email,
 	}
 
 	rows, err := u.db.DB().QueryContext(ctx, q, args)

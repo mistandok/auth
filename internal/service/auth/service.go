@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
+	"github.com/mistandok/auth/internal/utils"
 	"strconv"
 
 	"github.com/mistandok/auth/internal/model"
@@ -39,7 +40,7 @@ func NewService(
 
 // Login пользователя по email и паролю.
 func (s *Service) Login(ctx context.Context, userEmail string, userPassword string) (*model.Tokens, error) {
-	user, err := s.userRepo.GetByEmail(ctx, userEmail)
+	user, err := s.userRepo.GetByFilter(ctx, &model.UserFilter{Email: utils.Pointer[string](userEmail)})
 	if err != nil {
 		return nil, err
 	}

@@ -52,3 +52,9 @@ type UserClaims struct {
 	UserName string `json:"username"`
 	Role     string `json:"role"`
 }
+
+// UserFilter ..
+type UserFilter struct {
+	ID    *int64
+	Email *string
+}

@@ -3,6 +3,8 @@ package tests
 import (
 	"context"
 	"errors"
+	"github.com/mistandok/auth/internal/model"
+	"github.com/mistandok/auth/internal/utils"
 	"testing"
 	"time"
 
@@ -28,12 +30,13 @@ func TestCreate_SuccessGetUser(t *testing.T) {
 	passManager := password.NewManager(&config.PasswordConfig{PasswordSalt: "test"})
 
 	var userID int64 = 1
+	filter := &model.UserFilter{ID: utils.Pointer[int64](userID)}
 	curTime := time.Now()
 	user := userFromRepo(userID, curTime)
 	expectedResponse := userResponseForGet(userID, curTime)
 
 	userRepoMock := mocks.NewUserRepository(t)
-	userRepoMock.On("Get", ctx, userID).Return(user, nil).Once()
+	userRepoMock.On("GetByFilter", ctx, filter).Return(user, nil).Once()
 
 	service := userService.NewService(&logger, userRepoMock, passManager)
 
@@ -51,12 +54,13 @@ func TestCreate_FailGetUser(t *testing.T) {
 	passManager := password.NewManager(&config.PasswordConfig{PasswordSalt: "test"})
 
 	var userID int64 = 1
+	filter := &model.UserFilter{ID: utils.Pointer[int64](userID)}
 	request := &user_v1.GetRequest{Id: userID}
 
 	errorRepoMockGenerator := func(err error) *mocks.UserRepository {
 		userRepoMock := mocks.NewUserRepository(t)
 		userRepoMock.
-			On("Get", ctx, userID).
+			On("GetByFilter", ctx, filter).
 			Return(nil, err).
 			Once()
 
