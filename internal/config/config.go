@@ -124,8 +124,10 @@ type JWTConfig struct {
 
 // RedisConfig config for postgresql.
 type RedisConfig struct {
-	Host string
-	Port string
+	Host        string
+	Port        string
+	MaxIdle     int
+	IdleTimeout time.Duration
 }
 
 // Address get address from config

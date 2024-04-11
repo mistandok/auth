@@ -226,11 +226,12 @@ func (s *serviceProvider) TxManager(ctx context.Context) db.TxManager {
 
 func (s *serviceProvider) RedisPool(_ context.Context) *redis.Pool {
 	if s.whiteListPool == nil {
+		redisConfig := s.RedisConfig()
 		s.whiteListPool = &redis.Pool{
-			MaxIdle:     5,
-			IdleTimeout: 60 * time.Second,
+			MaxIdle:     redisConfig.MaxIdle,
+			IdleTimeout: redisConfig.IdleTimeout,
 			DialContext: func(ctx context.Context) (redis.Conn, error) {
-				return redis.DialContext(ctx, "tcp", s.RedisConfig().Address())
+				return redis.DialContext(ctx, "tcp", redisConfig.Address())
 			},
 			TestOnBorrowContext: func(ctx context.Context, conn redis.Conn, lastUsed time.Time) error {
 				if time.Since(lastUsed) < time.Minute {
