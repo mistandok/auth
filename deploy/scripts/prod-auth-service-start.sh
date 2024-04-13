@@ -14,4 +14,6 @@ wait_database()
 }
 
 wait_database $PG_HOST $PG_PORT
+wait_database $REDIS_HOST $REDIS_PORT
+
 ./auth_service -config=./deploy/env/.env.prod

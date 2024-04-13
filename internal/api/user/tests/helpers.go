@@ -3,7 +3,7 @@ package tests
 import (
 	"time"
 
-	"github.com/mistandok/auth/internal/common"
+	"github.com/mistandok/auth/internal/utils"
 
 	"github.com/mistandok/auth/internal/model"
 	"github.com/mistandok/auth/pkg/user_v1"
@@ -14,7 +14,7 @@ const (
 	userName      string          = "test"
 	userEmail     model.UserEmail = "test"
 	userEmailStr  string          = "test"
-	userPassword  string          = "test"
+	userPassword  string          = "password"
 	userRoleStr   string          = "USER"
 	userRole      user_v1.Role    = 1
 	userRoleModel model.UserRole  = "USER"
@@ -27,15 +27,6 @@ func userCreateRequest() *user_v1.CreateRequest {
 		Password:        userPassword,
 		PasswordConfirm: userPassword,
 		Role:            userRole,
-	}
-}
-
-func userCreateForRepo() *model.UserForCreate {
-	return &model.UserForCreate{
-		Name:     userName,
-		Email:    userEmail,
-		Password: userPassword,
-		Role:     userRoleModel,
 	}
 }
 
@@ -64,17 +55,17 @@ func userFromRepo(userID int64, userDate time.Time) *model.User {
 func userUpdateRequest(userID int64) *user_v1.UpdateRequest {
 	return &user_v1.UpdateRequest{
 		Id:    userID,
-		Name:  common.Pointer[string](userName),
-		Email: common.Pointer[string](userEmailStr),
-		Role:  common.Pointer[user_v1.Role](userRole),
+		Name:  utils.Pointer[string](userName),
+		Email: utils.Pointer[string](userEmailStr),
+		Role:  utils.Pointer[user_v1.Role](userRole),
 	}
 }
 
 func userUpdateRepo(userID int64) *model.UserForUpdate {
 	return &model.UserForUpdate{
 		ID:    userID,
-		Name:  common.Pointer[string](userName),
-		Email: common.Pointer[model.UserEmail](userEmail),
-		Role:  common.Pointer[model.UserRole](userRoleModel),
+		Name:  utils.Pointer[string](userName),
+		Email: utils.Pointer[model.UserEmail](userEmail),
+		Role:  utils.Pointer[model.UserRole](userRoleModel),
 	}
 }

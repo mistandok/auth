@@ -25,6 +25,15 @@ services:
     environment:
       PG_HOST: storage
 
+  redis:
+    image: redis:7.2.4
+    restart: always
+    env_file:
+      - deploy/env/.env.prod
+    expose:
+      - ${REDIS_PORT}
+    command: --port ${REDIS_PORT}
+
   auth_service:
     build:
       context: .
@@ -33,8 +42,11 @@ services:
       - deploy/env/.env.prod
     depends_on:
       - storage
+      - white_list
     environment:
       PG_HOST: storage
     ports:
       - "${GRPC_PORT}:${GRPC_PORT}"
+      - "${HTTP_PORT}:${HTTP_PORT}"
+      - "${SWAGGER_PORT}:${SWAGGER_PORT}"
     restart: on-failure

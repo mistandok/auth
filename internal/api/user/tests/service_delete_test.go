@@ -5,6 +5,9 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/mistandok/auth/internal/config"
+	"github.com/mistandok/auth/internal/utils/password"
+
 	userImpl "github.com/mistandok/auth/internal/api/user"
 	"github.com/mistandok/auth/internal/repository/mocks"
 	userService "github.com/mistandok/auth/internal/service/user"
@@ -16,6 +19,7 @@ import (
 func TestCreate_SuccessDeleteUser(t *testing.T) {
 	ctx := context.Background()
 	logger := zerolog.Nop()
+	passManager := password.NewManager(&config.PasswordConfig{PasswordSalt: "test"})
 
 	var userID int64 = 1
 	request := &user_v1.DeleteRequest{Id: userID}
@@ -23,7 +27,7 @@ func TestCreate_SuccessDeleteUser(t *testing.T) {
 	userRepoMock := mocks.NewUserRepository(t)
 	userRepoMock.On("Delete", ctx, userID).Return(nil).Once()
 
-	service := userService.NewService(&logger, userRepoMock)
+	service := userService.NewService(&logger, userRepoMock, passManager)
 
 	impl := userImpl.NewImplementation(service)
 
@@ -35,6 +39,7 @@ func TestCreate_SuccessDeleteUser(t *testing.T) {
 func TestCreate_FailDeleteUser(t *testing.T) {
 	ctx := context.Background()
 	logger := zerolog.Nop()
+	passManager := password.NewManager(&config.PasswordConfig{PasswordSalt: "test"})
 
 	var userID int64 = 1
 	request := &user_v1.DeleteRequest{Id: userID}
@@ -43,7 +48,7 @@ func TestCreate_FailDeleteUser(t *testing.T) {
 	userRepoMock := mocks.NewUserRepository(t)
 	userRepoMock.On("Delete", ctx, userID).Return(someErr).Once()
 
-	service := userService.NewService(&logger, userRepoMock)
+	service := userService.NewService(&logger, userRepoMock, passManager)
 
 	impl := userImpl.NewImplementation(service)
 

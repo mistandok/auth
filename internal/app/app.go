@@ -11,7 +11,9 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/mistandok/auth/internal/config"
-	desc "github.com/mistandok/auth/pkg/user_v1"
+	accessDesc "github.com/mistandok/auth/pkg/access_v1"
+	authDesc "github.com/mistandok/auth/pkg/auth_v1"
+	userDesc "github.com/mistandok/auth/pkg/user_v1"
 	"github.com/rakyll/statik/fs"
 
 	"github.com/mistandok/auth/internal/interceptor"
@@ -127,7 +129,9 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 
 	reflection.Register(a.grpcServer)
 
-	desc.RegisterUserV1Server(a.grpcServer, a.serviceProvider.UserImpl(ctx))
+	userDesc.RegisterUserV1Server(a.grpcServer, a.serviceProvider.UserImpl(ctx))
+	authDesc.RegisterAuthV1Server(a.grpcServer, a.serviceProvider.AuthImpl(ctx))
+	accessDesc.RegisterAccessV1Server(a.grpcServer, a.serviceProvider.AccessImpl(ctx))
 
 	return nil
 }
@@ -139,7 +143,17 @@ func (a *App) initHTTPServer(ctx context.Context) error {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
 
-	err := desc.RegisterUserV1HandlerFromEndpoint(ctx, mux, a.serviceProvider.GRPCConfig().Address(), opts)
+	err := userDesc.RegisterUserV1HandlerFromEndpoint(ctx, mux, a.serviceProvider.GRPCConfig().Address(), opts)
+	if err != nil {
+		return err
+	}
+
+	err = authDesc.RegisterAuthV1HandlerFromEndpoint(ctx, mux, a.serviceProvider.GRPCConfig().Address(), opts)
+	if err != nil {
+		return err
+	}
+
+	err = accessDesc.RegisterAccessV1HandlerFromEndpoint(ctx, mux, a.serviceProvider.GRPCConfig().Address(), opts)
 	if err != nil {
 		return err
 	}
@@ -168,7 +182,9 @@ func (a *App) initSwaggerServer(_ context.Context) error {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", http.StripPrefix("/", http.FileServer(statikFs)))
-	mux.HandleFunc("/api.swagger.json", serveSwaggerFile("/api.swagger.json"))
+	mux.HandleFunc("/user_api.swagger.json", serveSwaggerFile("/user_api.swagger.json"))
+	mux.HandleFunc("/auth_api.swagger.json", serveSwaggerFile("/auth_api.swagger.json"))
+	mux.HandleFunc("/access_api.swagger.json", serveSwaggerFile("/access_api.swagger.json"))
 
 	a.swaggerServer = &http.Server{
 		Addr:              a.serviceProvider.SwaggerConfig().Address(),

@@ -6,6 +6,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/mistandok/auth/internal/model"
+	"github.com/mistandok/auth/internal/utils"
+
+	"github.com/mistandok/auth/internal/config"
+	"github.com/mistandok/auth/internal/utils/password"
+
 	"github.com/mistandok/auth/internal/repository"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -22,16 +28,18 @@ import (
 func TestCreate_SuccessGetUser(t *testing.T) {
 	ctx := context.Background()
 	logger := zerolog.Nop()
+	passManager := password.NewManager(&config.PasswordConfig{PasswordSalt: "test"})
 
 	var userID int64 = 1
+	filter := &model.UserFilter{ID: utils.Pointer[int64](userID)}
 	curTime := time.Now()
 	user := userFromRepo(userID, curTime)
 	expectedResponse := userResponseForGet(userID, curTime)
 
 	userRepoMock := mocks.NewUserRepository(t)
-	userRepoMock.On("Get", ctx, userID).Return(user, nil).Once()
+	userRepoMock.On("GetByFilter", ctx, filter).Return(user, nil).Once()
 
-	service := userService.NewService(&logger, userRepoMock)
+	service := userService.NewService(&logger, userRepoMock, passManager)
 
 	impl := userImpl.NewImplementation(service)
 
@@ -44,14 +52,16 @@ func TestCreate_SuccessGetUser(t *testing.T) {
 func TestCreate_FailGetUser(t *testing.T) {
 	ctx := context.Background()
 	logger := zerolog.Nop()
+	passManager := password.NewManager(&config.PasswordConfig{PasswordSalt: "test"})
 
 	var userID int64 = 1
+	filter := &model.UserFilter{ID: utils.Pointer[int64](userID)}
 	request := &user_v1.GetRequest{Id: userID}
 
 	errorRepoMockGenerator := func(err error) *mocks.UserRepository {
 		userRepoMock := mocks.NewUserRepository(t)
 		userRepoMock.
-			On("Get", ctx, userID).
+			On("GetByFilter", ctx, filter).
 			Return(nil, err).
 			Once()
 
@@ -81,7 +91,7 @@ func TestCreate_FailGetUser(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			repoMock := errorRepoMockGenerator(test.internalError)
-			service := userService.NewService(&logger, repoMock)
+			service := userService.NewService(&logger, repoMock, passManager)
 			impl := userImpl.NewImplementation(service)
 
 			_, err := impl.Get(ctx, test.getRequest)

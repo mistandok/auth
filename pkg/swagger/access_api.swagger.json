@@ -1,0 +1,168 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Access API v1",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Anton Artikov",
+      "email": "arti-anton@yandex.ru"
+    }
+  },
+  "tags": [
+    {
+      "name": "AccessV1"
+    }
+  ],
+  "host": "localhost:8061",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/access/v1": {
+      "get": {
+        "summary": "Check проверить есть ли доступ к указанному Endpoint",
+        "operationId": "AccessV1_Check",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "address",
+            "description": "Адрес endpoint",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AccessV1"
+        ]
+      },
+      "post": {
+        "summary": "Create настройки доступа для Endpoint",
+        "operationId": "AccessV1_Create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/auth_v1CreateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/auth_v1CreateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AccessV1"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "auth_v1CreateRequest": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string",
+          "title": "Адрес endpoint"
+        },
+        "role": {
+          "$ref": "#/definitions/user_v1Role",
+          "title": "Роль пользователя"
+        }
+      }
+    },
+    "auth_v1CreateResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64",
+          "title": "Идентификатор настройки доступа для endpoint"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "user_v1Role": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "USER",
+        "ADMIN"
+      ],
+      "default": "UNKNOWN"
+    }
+  },
+  "securityDefinitions": {
+    "bearer": {
+      "type": "apiKey",
+      "description": "Authentication token, prefixed by Bearer: Bearer \u003ctoken\u003e",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "bearer": []
+    }
+  ]
+}

@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	"github.com/dgrijalva/jwt-go"
+)
 
 // UserEmail email пользователя
 type UserEmail string
@@ -20,6 +24,7 @@ type User struct {
 	Name      string
 	Email     UserEmail
 	Role      UserRole
+	Password  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -38,4 +43,18 @@ type UserForUpdate struct {
 	Name  *string
 	Email *UserEmail
 	Role  *UserRole
+}
+
+// UserClaims ..
+type UserClaims struct {
+	jwt.StandardClaims
+	UserID   string `json:"userID"`
+	UserName string `json:"username"`
+	Role     string `json:"role"`
+}
+
+// UserFilter ..
+type UserFilter struct {
+	ID    *int64
+	Email *string
 }

@@ -5,10 +5,13 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/mistandok/auth/internal/common"
+	"github.com/mistandok/auth/internal/config"
+	"github.com/mistandok/auth/internal/utils/password"
+
 	"github.com/mistandok/auth/internal/model"
 	"github.com/mistandok/auth/internal/repository/mocks"
 	userService "github.com/mistandok/auth/internal/service/user"
+	"github.com/mistandok/auth/internal/utils"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 )
@@ -16,22 +19,23 @@ import (
 func userForUpdate() *model.UserForUpdate {
 	return &model.UserForUpdate{
 		ID:    1,
-		Name:  common.Pointer[string]("test"),
-		Email: common.Pointer[model.UserEmail]("test"),
-		Role:  common.Pointer[model.UserRole]("admin"),
+		Name:  utils.Pointer[string]("test"),
+		Email: utils.Pointer[model.UserEmail]("test"),
+		Role:  utils.Pointer[model.UserRole]("admin"),
 	}
 }
 
 func TestUpdate_SuccessUpdateUser(t *testing.T) {
 	ctx := context.Background()
 	logger := zerolog.Nop()
+	passManager := password.NewManager(&config.PasswordConfig{PasswordSalt: "test"})
 
 	user := userForUpdate()
 
 	userRepoMock := mocks.NewUserRepository(t)
 	userRepoMock.On("Update", ctx, user).Return(nil).Once()
 
-	service := userService.NewService(&logger, userRepoMock)
+	service := userService.NewService(&logger, userRepoMock, passManager)
 
 	err := service.Update(ctx, user)
 
@@ -41,6 +45,7 @@ func TestUpdate_SuccessUpdateUser(t *testing.T) {
 func TestUpdate_FailUpdateUser(t *testing.T) {
 	ctx := context.Background()
 	logger := zerolog.Nop()
+	passManager := password.NewManager(&config.PasswordConfig{PasswordSalt: "test"})
 
 	user := userForUpdate()
 	repoErr := errors.New("some error")
@@ -48,7 +53,7 @@ func TestUpdate_FailUpdateUser(t *testing.T) {
 	userRepoMock := mocks.NewUserRepository(t)
 	userRepoMock.On("Update", ctx, user).Return(repoErr).Once()
 
-	service := userService.NewService(&logger, userRepoMock)
+	service := userService.NewService(&logger, userRepoMock, passManager)
 
 	err := service.Update(ctx, user)
 

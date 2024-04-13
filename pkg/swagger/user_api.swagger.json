@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Auth API",
+    "title": "User API v1",
     "version": "1.0.0",
     "contact": {
       "name": "Anton Artikov",

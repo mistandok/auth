@@ -3,15 +3,18 @@ module github.com/mistandok/auth
 go 1.21.3
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/envoyproxy/protoc-gen-validate v1.0.2
+	github.com/gomodule/redigo v1.9.2
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1
 	github.com/jackc/pgx/v5 v5.5.4
 	github.com/joho/godotenv v1.5.1
-	github.com/mistandok/platform_common v0.0.0-20240309141914-72e566afd0a7
+	github.com/mistandok/platform_common v0.0.6
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.10.1
 	github.com/rs/zerolog v1.32.0
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.4
+	golang.org/x/crypto v0.18.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240125205218-1f4bbc51befe
 	google.golang.org/grpc v1.61.1
 	google.golang.org/protobuf v1.33.0
@@ -29,7 +32,6 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
-	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sync v0.5.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect

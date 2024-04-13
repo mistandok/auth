@@ -14,6 +14,15 @@ services:
       - "${PG_PORT}:${PG_PORT}"
     command: -p ${PG_PORT}
 
+  redis:
+    image: redis:7.2.4
+    restart: always
+    command: --port ${REDIS_PORT}
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    env_file:
+      - deploy/env/.env.local
+
   migrator:
     build:
       dockerfile: deploy/dockerfiles/migrator.Dockerfile

@@ -6,6 +6,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/mistandok/auth/internal/utils"
+
+	"github.com/mistandok/auth/internal/config"
+	"github.com/mistandok/auth/internal/utils/password"
+
 	"github.com/mistandok/auth/internal/model"
 	"github.com/mistandok/auth/internal/repository/mocks"
 	userService "github.com/mistandok/auth/internal/service/user"
@@ -27,14 +32,16 @@ func userForGet(userID int64) *model.User {
 func TestGet_SuccessGetUser(t *testing.T) {
 	ctx := context.Background()
 	logger := zerolog.Nop()
+	passManager := password.NewManager(&config.PasswordConfig{PasswordSalt: "test"})
 
 	var userIDForGet int64 = 1
+	filter := &model.UserFilter{ID: utils.Pointer[int64](userIDForGet)}
 	expectedUser := userForGet(userIDForGet)
 
 	userRepoMock := mocks.NewUserRepository(t)
-	userRepoMock.On("Get", ctx, userIDForGet).Return(expectedUser, nil).Once()
+	userRepoMock.On("GetByFilter", ctx, filter).Return(expectedUser, nil).Once()
 
-	service := userService.NewService(&logger, userRepoMock)
+	service := userService.NewService(&logger, userRepoMock, passManager)
 
 	resultUser, err := service.Get(ctx, userIDForGet)
 
@@ -45,14 +52,16 @@ func TestGet_SuccessGetUser(t *testing.T) {
 func TestGet_FailGetUser(t *testing.T) {
 	ctx := context.Background()
 	logger := zerolog.Nop()
+	passManager := password.NewManager(&config.PasswordConfig{PasswordSalt: "test"})
 
 	var userIDForGet int64 = 1
+	filter := &model.UserFilter{ID: utils.Pointer[int64](userIDForGet)}
 	repoErr := errors.New("some error")
 
 	userRepoMock := mocks.NewUserRepository(t)
-	userRepoMock.On("Get", ctx, userIDForGet).Return(nil, repoErr).Once()
+	userRepoMock.On("GetByFilter", ctx, filter).Return(nil, repoErr).Once()
 
-	service := userService.NewService(&logger, userRepoMock)
+	service := userService.NewService(&logger, userRepoMock, passManager)
 
 	_, err := service.Get(ctx, userIDForGet)
 

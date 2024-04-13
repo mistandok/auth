@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package auth_v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/mistandok/auth/pkg/auth_v1;auth_v1";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Auth API v1"
+    version: "1.0.0"
+    contact: {
+      name: "Anton Artikov"
+      email: "arti-anton@yandex.ru"
+    };
+  };
+
+  host: "localhost:8061",
+  schemes: HTTP,
+  schemes: HTTPS,
+  consumes: "application/json",
+  produces: "application/json",
+};
+
+service AuthV1 {
+  // Login существующего пользователя
+  rpc Login (LoginRequest) returns (LoginResponse){
+    option (google.api.http) = {
+      post: "/auth/v1/login"
+      body: "*"
+    };
+  };
+
+  // Обновление access и refresh токенов по refresh токуне
+  rpc RefreshTokens (RefreshTokensRequest) returns (RefreshTokensResponse){
+    option (google.api.http) = {
+      post: "/auth/v1/refresh-tokens"
+      body: "*"
+    };
+  };
+}
+
+message LoginRequest {
+  // Email пользователя
+  string email = 1 [(validate.rules).string.email = true];
+  // Пароль пользователя
+  string password = 2;
+}
+
+message LoginResponse {
+  // Access token пользователя
+  string access_token = 1;
+  // Refresh token пользователя
+  string refresh_token = 2;
+}
+
+message RefreshTokensRequest {
+  // Refresh token пользователя
+  string refresh_token = 1;
+}
+
+message RefreshTokensResponse {
+  // Access token пользователя
+  string access_token = 1;
+  // Refresh token пользователя
+  string refresh_token = 2;
+}
