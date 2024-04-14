@@ -36,15 +36,16 @@ import (
 )
 
 type serviceProvider struct {
-	pgConfig       *config.PgConfig
-	grpcConfig     *config.GRPCConfig
-	httpConfig     *config.HTTPConfig
-	swaggerConfig  *config.SwaggerConfig
-	passwordConfig *config.PasswordConfig
-	jwtConfig      *config.JWTConfig
-	redisConfig    *config.RedisConfig
-	logger         *zerolog.Logger
-	passManager    *password.Manager
+	pgConfig         *config.PgConfig
+	grpcConfig       *config.GRPCConfig
+	httpConfig       *config.HTTPConfig
+	swaggerConfig    *config.SwaggerConfig
+	passwordConfig   *config.PasswordConfig
+	jwtConfig        *config.JWTConfig
+	redisConfig      *config.RedisConfig
+	prometheusConfig *config.PrometheusConfig
+	logger           *zerolog.Logger
+	passManager      *password.Manager
 
 	dbClient      db.Client
 	txManager     db.TxManager
@@ -171,6 +172,21 @@ func (s *serviceProvider) RedisConfig() *config.RedisConfig {
 	}
 
 	return s.redisConfig
+}
+
+// PrometheusConfig ..
+func (s *serviceProvider) PrometheusConfig() *config.PrometheusConfig {
+	if s.prometheusConfig == nil {
+		cfgSearcher := env.NewPrometheusCfgSearcher()
+		cfg, err := cfgSearcher.Get()
+		if err != nil {
+			log.Fatalf("не удалось получить prometheus config: %s", err.Error())
+		}
+
+		s.prometheusConfig = cfg
+	}
+
+	return s.prometheusConfig
 }
 
 // Logger ..
