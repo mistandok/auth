@@ -39,7 +39,7 @@ services:
   prometheus:
     image: prom/prometheus:v2.37.9
     ports:
-      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
+      - "9090:${PROMETHEUS_PORT}"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - ./alerts.yml:/etc/prometheus/alerts.yml
@@ -48,6 +48,6 @@ services:
   grafana:
     image: grafana/grafana-oss:10.0.3
     ports:
-      - "${GRAFANA_PORT}:${GRAFANA_PORT}"
+      - "3000:${GRAFANA_PORT}"
     volumes:
       - grafana_volume:/var/lib/grafana

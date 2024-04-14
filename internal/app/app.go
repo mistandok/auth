@@ -2,14 +2,15 @@ package app
 
 import (
 	"context"
-	"github.com/mistandok/auth/internal/metric"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"io"
 	"log"
 	"net"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/mistandok/auth/internal/metric"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/mistandok/auth/internal/config"
@@ -57,44 +58,30 @@ func (a *App) Run() error {
 		closer.Wait()
 	}()
 
+	runActions := []struct {
+		action func() error
+		errMsg string
+	}{
+		{action: a.runGRPCServer, errMsg: "ошибка при запуске GRPC сервера"},
+		{action: a.runHTTPServer, errMsg: "ошибка при запуске HTTP сервера"},
+		{action: a.runSwaggerServer, errMsg: "ошибка при запуске Swagger сервера"},
+		{action: a.runPrometheusServer, errMsg: "ошибка при запуске Prometheus сервера"},
+	}
+
 	wg := sync.WaitGroup{}
-	wg.Add(4)
+	wg.Add(len(runActions))
 
-	go func() {
-		defer wg.Done()
+	for _, runAction := range runActions {
+		currentRunAction := runAction
+		go func() {
+			defer wg.Done()
 
-		err := a.runGRPCServer()
-		if err != nil {
-			log.Fatalf("ошибка при запуске GRPC сервера")
-		}
-	}()
-
-	go func() {
-		defer wg.Done()
-
-		err := a.runHTTPServer()
-		if err != nil {
-			log.Fatalf("ошибка при запуске HTTP сервера")
-		}
-	}()
-
-	go func() {
-		defer wg.Done()
-
-		err := a.runSwaggerServer()
-		if err != nil {
-			log.Fatalf("ошибка при запуске Swagger сервера")
-		}
-	}()
-
-	go func() {
-		defer wg.Done()
-
-		err := a.runPrometheusServer()
-		if err != nil {
-			log.Fatalf("ошибка при запуске Prometheus сервера")
-		}
-	}()
+			err := currentRunAction.action()
+			if err != nil {
+				log.Fatalf(currentRunAction.errMsg)
+			}
+		}()
+	}
 
 	wg.Wait()
 
@@ -226,8 +213,9 @@ func (a *App) initPrometheusServer(_ context.Context) error {
 	mux.Handle("/metrics", promhttp.Handler())
 
 	a.prometheusServer = &http.Server{
-		Addr:    a.serviceProvider.PrometheusConfig().Address(),
-		Handler: mux,
+		Addr:              a.serviceProvider.PrometheusConfig().Address(),
+		Handler:           mux,
+		ReadHeaderTimeout: 2 * time.Second,
 	}
 
 	return nil

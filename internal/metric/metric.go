@@ -12,6 +12,7 @@ const (
 	appName   = "auth_app"
 )
 
+// Metrics метрики.
 type Metrics struct {
 	requestCounter        prometheus.Counter
 	responseCounter       *prometheus.CounterVec
@@ -20,6 +21,7 @@ type Metrics struct {
 
 var metrics *Metrics
 
+// Init инициализация метрик.
 func Init(_ context.Context) error {
 	metrics = &Metrics{
 		requestCounter: promauto.NewCounter(
@@ -54,14 +56,17 @@ func Init(_ context.Context) error {
 	return nil
 }
 
+// IncRequestCounter количество запросов.
 func IncRequestCounter() {
 	metrics.requestCounter.Inc()
 }
 
+// IncResponseCounter количество ответов.
 func IncResponseCounter(status string, method string) {
 	metrics.responseCounter.WithLabelValues(status, method).Inc()
 }
 
+// HistogramResponseTimeObserve время ответа.
 func HistogramResponseTimeObserve(status string, time float64) {
 	metrics.histogramResponseTime.WithLabelValues(status).Observe(time)
 }

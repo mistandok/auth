@@ -2,11 +2,13 @@ package interceptor
 
 import (
 	"context"
+	"time"
+
 	"github.com/mistandok/auth/internal/metric"
 	"google.golang.org/grpc"
-	"time"
 )
 
+// MetricsInterceptor записывает метрики по времени отвера и по запросам
 func MetricsInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	metric.IncRequestCounter()
 
