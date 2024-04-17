@@ -9,6 +9,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
+	"github.com/opentracing/opentracing-go"
+
+	"github.com/mistandok/auth/internal/metric"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	jaegerConfig "github.com/uber/jaeger-client-go/config"
+
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/mistandok/auth/internal/config"
 	accessDesc "github.com/mistandok/auth/pkg/access_v1"
@@ -27,13 +34,18 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
+const (
+	serviceName = "auth"
+)
+
 // App ..
 type App struct {
-	serviceProvider *serviceProvider
-	grpcServer      *grpc.Server
-	httpServer      *http.Server
-	swaggerServer   *http.Server
-	configPath      string
+	serviceProvider  *serviceProvider
+	grpcServer       *grpc.Server
+	httpServer       *http.Server
+	swaggerServer    *http.Server
+	prometheusServer *http.Server
+	configPath       string
 }
 
 // NewApp ..
@@ -54,35 +66,30 @@ func (a *App) Run() error {
 		closer.Wait()
 	}()
 
+	runActions := []struct {
+		action func() error
+		errMsg string
+	}{
+		{action: a.runGRPCServer, errMsg: "ошибка при запуске GRPC сервера"},
+		{action: a.runHTTPServer, errMsg: "ошибка при запуске HTTP сервера"},
+		{action: a.runSwaggerServer, errMsg: "ошибка при запуске Swagger сервера"},
+		{action: a.runPrometheusServer, errMsg: "ошибка при запуске Prometheus сервера"},
+	}
+
 	wg := sync.WaitGroup{}
-	wg.Add(3)
+	wg.Add(len(runActions))
 
-	go func() {
-		defer wg.Done()
+	for _, runAction := range runActions {
+		currentRunAction := runAction
+		go func() {
+			defer wg.Done()
 
-		err := a.runGRPCServer()
-		if err != nil {
-			log.Fatalf("ошибка при запуске GRPC сервера")
-		}
-	}()
-
-	go func() {
-		defer wg.Done()
-
-		err := a.runHTTPServer()
-		if err != nil {
-			log.Fatalf("ошибка при запуске HTTP сервера")
-		}
-	}()
-
-	go func() {
-		defer wg.Done()
-
-		err := a.runSwaggerServer()
-		if err != nil {
-			log.Fatalf("ошибка при запуске Swagger сервера")
-		}
-	}()
+			err := currentRunAction.action()
+			if err != nil {
+				log.Fatalf(currentRunAction.errMsg)
+			}
+		}()
+	}
 
 	wg.Wait()
 
@@ -92,10 +99,13 @@ func (a *App) Run() error {
 func (a *App) initDeps(ctx context.Context) error {
 	initDepFunctions := []func(context.Context) error{
 		a.initConfig,
+		a.initGlobalTracer,
 		a.initServiceProvider,
 		a.initGRPCServer,
 		a.initHTTPServer,
 		a.initSwaggerServer,
+		a.initMetrics,
+		a.initPrometheusServer,
 	}
 
 	for _, f := range initDepFunctions {
@@ -124,7 +134,12 @@ func (a *App) initServiceProvider(_ context.Context) error {
 func (a *App) initGRPCServer(ctx context.Context) error {
 	a.grpcServer = grpc.NewServer(
 		grpc.Creds(insecure.NewCredentials()),
-		grpc.UnaryInterceptor(interceptor.ValidateInterceptor),
+		grpc.ChainUnaryInterceptor(
+			otgrpc.OpenTracingServerInterceptor(opentracing.GlobalTracer()),
+			interceptor.ServerTracingInterceptor,
+			interceptor.MetricsInterceptor,
+			interceptor.ValidateInterceptor,
+		),
 	)
 
 	reflection.Register(a.grpcServer)
@@ -193,6 +208,35 @@ func (a *App) initSwaggerServer(_ context.Context) error {
 	}
 
 	return nil
+}
+
+func (a *App) initMetrics(ctx context.Context) error {
+	return metric.Init(ctx)
+}
+
+func (a *App) initPrometheusServer(_ context.Context) error {
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.Handler())
+
+	a.prometheusServer = &http.Server{
+		Addr:              a.serviceProvider.PrometheusConfig().Address(),
+		Handler:           mux,
+		ReadHeaderTimeout: 2 * time.Second,
+	}
+
+	return nil
+}
+
+func (a *App) initGlobalTracer(_ context.Context) error {
+	cfg := jaegerConfig.Configuration{
+		Sampler: &jaegerConfig.SamplerConfig{
+			Type:  "const",
+			Param: 1,
+		},
+	}
+
+	_, err := cfg.InitGlobalTracer(serviceName)
+	return err
 }
 
 func (a *App) runGRPCServer() error {
@@ -274,4 +318,16 @@ func serveSwaggerFile(path string) http.HandlerFunc {
 
 		log.Printf("Served swagger file: %s", path)
 	}
+}
+
+func (a *App) runPrometheusServer() error {
+	log.Printf("Prometheus запущен на %s", a.serviceProvider.PrometheusConfig().Address())
+	log.Printf("Prometheus доступен по адресу %s", a.serviceProvider.PrometheusConfig().PublicAddress())
+
+	err := a.prometheusServer.ListenAndServe()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
