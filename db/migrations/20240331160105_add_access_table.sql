@@ -14,7 +14,8 @@ INSERT INTO endpoint_access (address, role, created_at, updated_at)
 VALUES
     ('/chat_v1.ChatV1/Create', 'USER', current_date, current_date),
     ('/chat_v1.ChatV1/SendMessage', 'USER', current_date, current_date),
-    ('/chat_v1.ChatV1/Delete', 'USER', current_date, current_date)
+    ('/chat_v1.ChatV1/Delete', 'USER', current_date, current_date),
+    ('/chat_v1.ChatV1/ConnectChat', 'USER', current_date, current_date)
 ON CONFLICT (address, role) DO UPDATE
 SET role = EXCLUDED.role;
 
